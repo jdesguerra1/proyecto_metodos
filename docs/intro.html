@@ -294,7 +294,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 ##   ..   X25 = col_double(),
 ##   ..   X26 = col_character()
 ##   .. )
-##  - attr(*, &quot;problems&quot;)=&lt;pointer: 0x000002a7a25e5e20&gt;</code></pre>
+##  - attr(*, &quot;problems&quot;)=&lt;pointer: 0x000001fae62ffda0&gt;</code></pre>
 <p>Veamos si hay datos faltantes</p>
 <div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" tabindex="-1"></a>colSums</span></code></pre></div>
 <pre><code>## function (x, na.rm = FALSE, dims = 1L) 
@@ -316,7 +316,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 ##     else names(z) &lt;- dimnames(x)[[dims + 1L]]
 ##     z
 ## }
-## &lt;bytecode: 0x000002a7a61b3620&gt;
+## &lt;bytecode: 0x000001fae719e190&gt;
 ## &lt;environment: namespace:base&gt;</code></pre>
 <div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" tabindex="-1"></a>Automobile[Automobile <span class="sc">==</span> <span class="st">&quot;?&quot;</span>] <span class="ot">&lt;-</span> <span class="cn">NA</span></span>
 <span id="cb11-2"><a href="#cb11-2" tabindex="-1"></a></span>
@@ -540,7 +540,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div id="feature-engineering-nuevas-variables" class="section level2 hasAnchor" number="1.19">
 <h2><span class="header-section-number">1.19</span> Feature Engineering (Nuevas Variables)<a href="#feature-engineering-nuevas-variables" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>Para reducir la correlación y encontrar mejores predictores, crearemos nuevas variables como el promedio de rendimiento de combustible y la relación peso-potencia.</p>
-<div class="sourceCode" id="cb29"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" tabindex="-1"></a><span class="co"># Promedio de rendimiento de combustible (ciudad y carretera)</span></span>
+<div class="sourceCode" id="cb29"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" tabindex="-1"></a><span class="co"># Promedio de rendimiento de combustible (ciudad y carretera)  1</span></span>
 <span id="cb29-2"><a href="#cb29-2" tabindex="-1"></a>df<span class="sc">$</span>avg_mpg <span class="ot">&lt;-</span> (df<span class="sc">$</span><span class="st">`</span><span class="at">city-mpg</span><span class="st">`</span> <span class="sc">+</span> df<span class="sc">$</span><span class="st">`</span><span class="at">highway-mpg</span><span class="st">`</span>) <span class="sc">/</span> <span class="dv">2</span></span>
 <span id="cb29-3"><a href="#cb29-3" tabindex="-1"></a></span>
 <span id="cb29-4"><a href="#cb29-4" tabindex="-1"></a><span class="co"># Relación peso-potencia (peso dividido por caballos de fuerza)</span></span>

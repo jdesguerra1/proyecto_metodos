@@ -241,7 +241,7 @@ INTERPRETACION DE ESA TABLA ^^^^^^^^^
 Para reducir la correlación y encontrar mejores predictores, crearemos nuevas variables como el promedio de rendimiento de combustible y la relación peso-potencia.
 
 ```{r nuevas_variables_autos}
-# Promedio de rendimiento de combustible (ciudad y carretera)
+# Promedio de rendimiento de combustible (ciudad y carretera)  1
 df$avg_mpg <- (df$`city-mpg` + df$`highway-mpg`) / 2
 
 # Relación peso-potencia (peso dividido por caballos de fuerza)
