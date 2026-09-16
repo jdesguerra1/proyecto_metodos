@@ -1,0 +1,28 @@
+# EDA {#intro}
+```{r libreria, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(dtplyr)
+library(Amelia)
+library(moments)
+library(patchwork)
+library(GGally)
+library(readr)
+```
+
+```{r}
+
+Automobile <- read_csv("data/automobile/imports-85.data", 
+    col_names = FALSE)
+
+colnames(Automobile) <- c(
+  "symboling", "normalized-losses", "make", "fuel-type", "aspiration",
+  "num-of-doors", "body-style", "drive-wheels", "engine-location",
+  "wheel-base", "length", "width", "height", "curb-weight",
+  "engine-type", "num-of-cylinders", "engine-size", "fuel-system",
+  "bore", "stroke", "compression-ratio", "horsepower", "peak-rpm",
+  "city-mpg", "highway-mpg", "price"
+)
+
+View(Automobile)
+```
+
