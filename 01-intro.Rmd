@@ -227,11 +227,10 @@ INTERPRETACION DE ESA TABLA ^^^^^^^^^
 ```{r}
 # Relación entre estilo de carrocería y precio
 df %>%
-  ggplot(aes(x = `body-style`, y= price, fill = `body-style`))+
-  geom_boxplot(color = "black", outlier.color = 'red', alpha = 0.8) +
+  ggplot(aes(x = `body-style`, y = price)) +
+  geom_boxplot(fill = "#9b5e4f", color = "black", outlier.color = 'red', alpha = 0.8) +
   labs(title = "Distribución del Precio según la Carrocería", x = "Estilo", y = "Precio (USD)") +
-  theme_bw() +
-  theme(legend.position = "none")
+  theme_bw()
 ```
 -------------------------------------
 INTERPRETACION DE ESA TABLA ^^^^^^^^^

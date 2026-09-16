@@ -294,7 +294,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 ##   ..   X25 = col_double(),
 ##   ..   X26 = col_character()
 ##   .. )
-##  - attr(*, &quot;problems&quot;)=&lt;pointer: 0x000002442c1ffda0&gt;</code></pre>
+##  - attr(*, &quot;problems&quot;)=&lt;pointer: 0x0000025b712f7cf0&gt;</code></pre>
 <p>Veamos si hay datos faltantes</p>
 <div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" tabindex="-1"></a>colSums</span></code></pre></div>
 <pre><code>## function (x, na.rm = FALSE, dims = 1L) 
@@ -316,7 +316,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 ##     else names(z) &lt;- dimnames(x)[[dims + 1L]]
 ##     z
 ## }
-## &lt;bytecode: 0x000002442d192d28&gt;
+## &lt;bytecode: 0x0000025b73238270&gt;
 ## &lt;environment: namespace:base&gt;</code></pre>
 <div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" tabindex="-1"></a>Automobile[Automobile <span class="sc">==</span> <span class="st">&quot;?&quot;</span>] <span class="ot">&lt;-</span> <span class="cn">NA</span></span>
 <span id="cb11-2"><a href="#cb11-2" tabindex="-1"></a></span>
@@ -527,11 +527,10 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <h2><span class="header-section-number">1.16</span> INTERPRETACION DE ESA TABLA <sup></sup>^<a href="#interpretacion-de-esa-tabla-5" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <div class="sourceCode" id="cb28"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" tabindex="-1"></a><span class="co"># Relación entre estilo de carrocería y precio</span></span>
 <span id="cb28-2"><a href="#cb28-2" tabindex="-1"></a>df <span class="sc">%&gt;%</span></span>
-<span id="cb28-3"><a href="#cb28-3" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> <span class="st">`</span><span class="at">body-style</span><span class="st">`</span>, <span class="at">y=</span> price, <span class="at">fill =</span> <span class="st">`</span><span class="at">body-style</span><span class="st">`</span>))<span class="sc">+</span></span>
-<span id="cb28-4"><a href="#cb28-4" tabindex="-1"></a>  <span class="fu">geom_boxplot</span>(<span class="at">color =</span> <span class="st">&quot;black&quot;</span>, <span class="at">outlier.color =</span> <span class="st">&#39;red&#39;</span>, <span class="at">alpha =</span> <span class="fl">0.8</span>) <span class="sc">+</span></span>
+<span id="cb28-3"><a href="#cb28-3" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> <span class="st">`</span><span class="at">body-style</span><span class="st">`</span>, <span class="at">y =</span> price)) <span class="sc">+</span></span>
+<span id="cb28-4"><a href="#cb28-4" tabindex="-1"></a>  <span class="fu">geom_boxplot</span>(<span class="at">fill =</span> <span class="st">&quot;#9b5e4f&quot;</span>, <span class="at">color =</span> <span class="st">&quot;black&quot;</span>, <span class="at">outlier.color =</span> <span class="st">&#39;red&#39;</span>, <span class="at">alpha =</span> <span class="fl">0.8</span>) <span class="sc">+</span></span>
 <span id="cb28-5"><a href="#cb28-5" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">&quot;Distribución del Precio según la Carrocería&quot;</span>, <span class="at">x =</span> <span class="st">&quot;Estilo&quot;</span>, <span class="at">y =</span> <span class="st">&quot;Precio (USD)&quot;</span>) <span class="sc">+</span></span>
-<span id="cb28-6"><a href="#cb28-6" tabindex="-1"></a>  <span class="fu">theme_bw</span>() <span class="sc">+</span></span>
-<span id="cb28-7"><a href="#cb28-7" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">&quot;none&quot;</span>)</span></code></pre></div>
+<span id="cb28-6"><a href="#cb28-6" tabindex="-1"></a>  <span class="fu">theme_bw</span>()</span></code></pre></div>
 </div>
 <div id="section-6" class="section level2 hasAnchor" number="1.17">
 <h2><span class="header-section-number">1.17</span> <img src="bookdown-demo_files/figure-html/unnamed-chunk-5-1.png" alt="" width="672" /><a href="#section-6" class="anchor-section" aria-label="Anchor link to header"></a></h2>
