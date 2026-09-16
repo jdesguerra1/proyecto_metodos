@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+<head>
+
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <title>Proyecto final metodos estadisticos</title>
+  <meta name="description" content="Proyecto final metodos estadisticos" />
+  <meta name="generator" content="bookdown 0.47 and GitBook 2.6.7" />
+
+  <meta property="og:title" content="Proyecto final metodos estadisticos" />
+  <meta property="og:type" content="book" />
+  
+  
+  <meta name="github-repo" content="rstudio/bookdown-demo" />
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Proyecto final metodos estadisticos" />
+  
+  
+  
+
+<meta name="author" content="Jesus Esguerra y Santiago Gomez" />
+
+
+<meta name="date" content="2026-09-16" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+  
+  
+
+
+<script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
+<link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-clipboard.css" rel="stylesheet" />
+
+
+
+
+
+
+
+
+<link href="libs/anchor-sections-1.1.0/anchor-sections.css" rel="stylesheet" />
+<link href="libs/anchor-sections-1.1.0/anchor-sections-hash.css" rel="stylesheet" />
+<script src="libs/anchor-sections-1.1.0/anchor-sections.js"></script>
+
+
+<style type="text/css">
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { color: #008000; } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { color: #008000; font-weight: bold; } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+<style type="text/css">
+  
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+</style>
+
+<link rel="stylesheet" href="style.css" type="text/css" />
+</head>
+
+<body>
+
+
+
+  <div class="book without-animation with-summary font-size-2 font-family-1" data-basepath=".">
+
+    <div class="book-summary">
+      <nav role="navigation">
+
+<ul class="summary">
+<li><a href="./">A Minimal Book Example</a></li>
+
+<li class="divider"></li>
+<li class="chapter" data-level="1" data-path="01-intro.html"><a href="#intro"><i class="fa fa-check"></i><b>1</b> EDA</a>
+<ul>
+<li class="chapter" data-level="1.1" data-path="01-intro.html"><a href="#an%C3%A1lisis-exploratorio-de-price-target"><i class="fa fa-check"></i><b>1.1</b> Análisis exploratorio de price (Target)</a></li>
+<li class="chapter" data-level="1.2" data-path="01-intro.html"><a href="#section"><i class="fa fa-check"></i><b>1.2</b> <img src="bookdown-demo_files/figure-html/histprice-1.png" alt="" width="672" /></a></li>
+<li class="chapter" data-level="1.3" data-path="01-intro.html"><a href="#interpretacion-de-esa-tabla"><i class="fa fa-check"></i><b>1.3</b> INTERPRETACION DE ESA TABLA <sup></sup>^</a></li>
+<li class="chapter" data-level="1.4" data-path="01-intro.html"><a href="#section-1"><i class="fa fa-check"></i><b>1.4</b> <img src="bookdown-demo_files/figure-html/unnamed-chunk-2-1.png" alt="" width="672" /></a></li>
+<li class="chapter" data-level="1.5" data-path="01-intro.html"><a href="#interpretacion-de-esa-tabla-1"><i class="fa fa-check"></i><b>1.5</b> INTERPRETACION DE ESA TABLA <sup></sup>^</a></li>
+<li class="chapter" data-level="1.6" data-path="01-intro.html"><a href="#section-2"><i class="fa fa-check"></i><b>1.6</b> <img src="bookdown-demo_files/figure-html/unnamed-chunk-3-1.png" alt="" width="672" /></a></li>
+<li class="chapter" data-level="1.7" data-path="01-intro.html"><a href="#interpretacion-de-esa-tabla-2"><i class="fa fa-check"></i><b>1.7</b> INTERPRETACION DE ESA TABLA <sup></sup>^</a></li>
+<li class="chapter" data-level="1.8" data-path="01-intro.html"><a href="#an%C3%A1lisis-de-las-variables-num%C3%A9ricas-independientes"><i class="fa fa-check"></i><b>1.8</b> Análisis de las variables numéricas independientes</a></li>
+<li class="chapter" data-level="1.9" data-path="01-intro.html"><a href="#section-3"><i class="fa fa-check"></i><b>1.9</b> <img src="bookdown-demo_files/figure-html/unnamed-chunk-4-1.png" alt="" width="672" /></a></li>
+<li class="chapter" data-level="1.10" data-path="01-intro.html"><a href="#interpretacion-de-esa-tabla-3"><i class="fa fa-check"></i><b>1.10</b> INTERPRETACION DE ESA TABLA <sup></sup>^</a></li>
+<li class="chapter" data-level="1.11" data-path="01-intro.html"><a href="#an%C3%A1lisis-de-variable-categ%C3%B3rica-body-style"><i class="fa fa-check"></i><b>1.11</b> Análisis de variable categórica: body-style</a></li>
+<li class="chapter" data-level="1.12" data-path="01-intro.html"><a href="#section-4"><i class="fa fa-check"></i><b>1.12</b> <img src="bookdown-demo_files/figure-html/var_categorica-1.png" alt="" width="672" /></a></li>
+<li class="chapter" data-level="1.13" data-path="01-intro.html"><a href="#interpretacion-de-esa-tabla-4"><i class="fa fa-check"></i><b>1.13</b> INTERPRETACION DE ESA TABLA <sup></sup>^</a></li>
+<li class="chapter" data-level="1.14" data-path="01-intro.html"><a href="#an%C3%A1lisis-exploratorio-bivariado"><i class="fa fa-check"></i><b>1.14</b> Análisis Exploratorio Bivariado</a></li>
+<li class="chapter" data-level="1.15" data-path="01-intro.html"><a href="#section-5"><i class="fa fa-check"></i><b>1.15</b> <img src="bookdown-demo_files/figure-html/bi_num_vs_target-1.png" alt="" width="672" /></a></li>
+<li class="chapter" data-level="1.16" data-path="01-intro.html"><a href="#interpretacion-de-esa-tabla-5"><i class="fa fa-check"></i><b>1.16</b> INTERPRETACION DE ESA TABLA <sup></sup>^</a></li>
+<li class="chapter" data-level="1.17" data-path="01-intro.html"><a href="#section-6"><i class="fa fa-check"></i><b>1.17</b> <img src="bookdown-demo_files/figure-html/unnamed-chunk-5-1.png" alt="" width="672" /></a></li>
+<li class="chapter" data-level="1.18" data-path="01-intro.html"><a href="#interpretacion-de-esa-tabla-6"><i class="fa fa-check"></i><b>1.18</b> INTERPRETACION DE ESA TABLA <sup></sup>^</a></li>
+<li class="chapter" data-level="1.19" data-path="01-intro.html"><a href="#feature-engineering-nuevas-variables"><i class="fa fa-check"></i><b>1.19</b> Feature Engineering (Nuevas Variables)</a></li>
+<li class="chapter" data-level="1.20" data-path="01-intro.html"><a href="#section-7"><i class="fa fa-check"></i><b>1.20</b> <img src="bookdown-demo_files/figure-html/unnamed-chunk-6-1.png" alt="" width="672" /></a></li>
+<li class="chapter" data-level="1.21" data-path="01-intro.html"><a href="#interpretacion-de-esa-tabla-7"><i class="fa fa-check"></i><b>1.21</b> INTERPRETACION DE ESA TABLA <sup></sup>^</a></li>
+</ul></li>
+<li class="divider"></li>
+<li><a href="https://github.com/rstudio/bookdown" target="blank">Published with bookdown</a></li>
+
+</ul>
+
+      </nav>
+    </div>
+
+    <div class="book-body">
+      <div class="body-inner">
+        <div class="book-header" role="navigation">
+          <h1>
+            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">Proyecto final metodos estadisticos</a>
+          </h1>
+        </div>
+
+        <div class="page-wrapper" tabindex="-1" role="main">
+          <div class="page-inner">
+
+            <section class="normal" id="section-">
+<div id="header">
+<h1 class="title">Proyecto final metodos estadisticos</h1>
+<p class="author"><em>Jesus Esguerra y Santiago Gomez</em></p>
+<p class="date"><em>2026-09-16</em></p>
+</div>
+<div id="intro" class="section level1 hasAnchor" number="1">
+<h1><span class="header-section-number">Chapter 1</span> EDA<a href="#intro" class="anchor-section" aria-label="Anchor link to header"></a></h1>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a><span class="fu">library</span>(dtplyr)</span>
+<span id="cb1-3"><a href="#cb1-3" tabindex="-1"></a><span class="fu">library</span>(Amelia)</span>
+<span id="cb1-4"><a href="#cb1-4" tabindex="-1"></a><span class="fu">library</span>(moments)</span>
+<span id="cb1-5"><a href="#cb1-5" tabindex="-1"></a><span class="fu">library</span>(patchwork)</span>
+<span id="cb1-6"><a href="#cb1-6" tabindex="-1"></a><span class="fu">library</span>(GGally)</span>
+<span id="cb1-7"><a href="#cb1-7" tabindex="-1"></a><span class="fu">library</span>(readr)</span>
+<span id="cb1-8"><a href="#cb1-8" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
+<span id="cb1-9"><a href="#cb1-9" tabindex="-1"></a><span class="fu">library</span>(moments) </span>
+<span id="cb1-10"><a href="#cb1-10" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a>Automobile <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">&quot;data/automobile/imports-85.data&quot;</span>, </span>
+<span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a>    <span class="at">col_names =</span> <span class="cn">FALSE</span>)</span></code></pre></div>
+<pre><code>## Rows: 205 Columns: 26
+## ── Column specification ────────────────────────────────────────────────────────
+## Delimiter: &quot;,&quot;
+## chr (16): X2, X3, X4, X5, X6, X7, X8, X9, X15, X16, X18, X19, X20, X22, X23,...
+## dbl (10): X1, X10, X11, X12, X13, X14, X17, X21, X24, X25
+## 
+## ℹ Use `spec()` to retrieve the full column specification for this data.
+## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a><span class="fu">colnames</span>(Automobile) <span class="ot">&lt;-</span> <span class="fu">c</span>(</span>
+<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a>  <span class="st">&quot;symboling&quot;</span>, <span class="st">&quot;normalized-losses&quot;</span>, <span class="st">&quot;make&quot;</span>, <span class="st">&quot;fuel-type&quot;</span>, <span class="st">&quot;aspiration&quot;</span>,</span>
+<span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a>  <span class="st">&quot;num-of-doors&quot;</span>, <span class="st">&quot;body-style&quot;</span>, <span class="st">&quot;drive-wheels&quot;</span>, <span class="st">&quot;engine-location&quot;</span>,</span>
+<span id="cb4-4"><a href="#cb4-4" tabindex="-1"></a>  <span class="st">&quot;wheel-base&quot;</span>, <span class="st">&quot;length&quot;</span>, <span class="st">&quot;width&quot;</span>, <span class="st">&quot;height&quot;</span>, <span class="st">&quot;curb-weight&quot;</span>,</span>
+<span id="cb4-5"><a href="#cb4-5" tabindex="-1"></a>  <span class="st">&quot;engine-type&quot;</span>, <span class="st">&quot;num-of-cylinders&quot;</span>, <span class="st">&quot;engine-size&quot;</span>, <span class="st">&quot;fuel-system&quot;</span>,</span>
+<span id="cb4-6"><a href="#cb4-6" tabindex="-1"></a>  <span class="st">&quot;bore&quot;</span>, <span class="st">&quot;stroke&quot;</span>, <span class="st">&quot;compression-ratio&quot;</span>, <span class="st">&quot;horsepower&quot;</span>, <span class="st">&quot;peak-rpm&quot;</span>,</span>
+<span id="cb4-7"><a href="#cb4-7" tabindex="-1"></a>  <span class="st">&quot;city-mpg&quot;</span>, <span class="st">&quot;highway-mpg&quot;</span>, <span class="st">&quot;price&quot;</span></span>
+<span id="cb4-8"><a href="#cb4-8" tabindex="-1"></a>)</span></code></pre></div>
+<p>Muestrame las 5 primeras filas</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a><span class="fu">head</span>(Automobile, <span class="at">n=</span><span class="dv">5</span>)</span></code></pre></div>
+<pre><code>## # A tibble: 5 × 26
+##   symboling `normalized-losses` make       `fuel-type` aspiration `num-of-doors`
+##       &lt;dbl&gt; &lt;chr&gt;               &lt;chr&gt;      &lt;chr&gt;       &lt;chr&gt;      &lt;chr&gt;         
+## 1         3 ?                   alfa-rome… gas         std        two           
+## 2         3 ?                   alfa-rome… gas         std        two           
+## 3         1 ?                   alfa-rome… gas         std        two           
+## 4         2 164                 audi       gas         std        four          
+## 5         2 164                 audi       gas         std        four          
+## # ℹ 20 more variables: `body-style` &lt;chr&gt;, `drive-wheels` &lt;chr&gt;,
+## #   `engine-location` &lt;chr&gt;, `wheel-base` &lt;dbl&gt;, length &lt;dbl&gt;, width &lt;dbl&gt;,
+## #   height &lt;dbl&gt;, `curb-weight` &lt;dbl&gt;, `engine-type` &lt;chr&gt;,
+## #   `num-of-cylinders` &lt;chr&gt;, `engine-size` &lt;dbl&gt;, `fuel-system` &lt;chr&gt;,
+## #   bore &lt;chr&gt;, stroke &lt;chr&gt;, `compression-ratio` &lt;dbl&gt;, horsepower &lt;chr&gt;,
+## #   `peak-rpm` &lt;chr&gt;, `city-mpg` &lt;dbl&gt;, `highway-mpg` &lt;dbl&gt;, price &lt;chr&gt;</code></pre>
+<p>La estructura de los datos</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a><span class="fu">str</span>(Automobile)</span></code></pre></div>
+<pre><code>## spc_tbl_ [205 × 26] (S3: spec_tbl_df/tbl_df/tbl/data.frame)
+##  $ symboling        : num [1:205] 3 3 1 2 2 2 1 1 1 0 ...
+##  $ normalized-losses: chr [1:205] &quot;?&quot; &quot;?&quot; &quot;?&quot; &quot;164&quot; ...
+##  $ make             : chr [1:205] &quot;alfa-romero&quot; &quot;alfa-romero&quot; &quot;alfa-romero&quot; &quot;audi&quot; ...
+##  $ fuel-type        : chr [1:205] &quot;gas&quot; &quot;gas&quot; &quot;gas&quot; &quot;gas&quot; ...
+##  $ aspiration       : chr [1:205] &quot;std&quot; &quot;std&quot; &quot;std&quot; &quot;std&quot; ...
+##  $ num-of-doors     : chr [1:205] &quot;two&quot; &quot;two&quot; &quot;two&quot; &quot;four&quot; ...
+##  $ body-style       : chr [1:205] &quot;convertible&quot; &quot;convertible&quot; &quot;hatchback&quot; &quot;sedan&quot; ...
+##  $ drive-wheels     : chr [1:205] &quot;rwd&quot; &quot;rwd&quot; &quot;rwd&quot; &quot;fwd&quot; ...
+##  $ engine-location  : chr [1:205] &quot;front&quot; &quot;front&quot; &quot;front&quot; &quot;front&quot; ...
+##  $ wheel-base       : num [1:205] 88.6 88.6 94.5 99.8 99.4 ...
+##  $ length           : num [1:205] 169 169 171 177 177 ...
+##  $ width            : num [1:205] 64.1 64.1 65.5 66.2 66.4 66.3 71.4 71.4 71.4 67.9 ...
+##  $ height           : num [1:205] 48.8 48.8 52.4 54.3 54.3 53.1 55.7 55.7 55.9 52 ...
+##  $ curb-weight      : num [1:205] 2548 2548 2823 2337 2824 ...
+##  $ engine-type      : chr [1:205] &quot;dohc&quot; &quot;dohc&quot; &quot;ohcv&quot; &quot;ohc&quot; ...
+##  $ num-of-cylinders : chr [1:205] &quot;four&quot; &quot;four&quot; &quot;six&quot; &quot;four&quot; ...
+##  $ engine-size      : num [1:205] 130 130 152 109 136 136 136 136 131 131 ...
+##  $ fuel-system      : chr [1:205] &quot;mpfi&quot; &quot;mpfi&quot; &quot;mpfi&quot; &quot;mpfi&quot; ...
+##  $ bore             : chr [1:205] &quot;3.47&quot; &quot;3.47&quot; &quot;2.68&quot; &quot;3.19&quot; ...
+##  $ stroke           : chr [1:205] &quot;2.68&quot; &quot;2.68&quot; &quot;3.47&quot; &quot;3.40&quot; ...
+##  $ compression-ratio: num [1:205] 9 9 9 10 8 8.5 8.5 8.5 8.3 7 ...
+##  $ horsepower       : chr [1:205] &quot;111&quot; &quot;111&quot; &quot;154&quot; &quot;102&quot; ...
+##  $ peak-rpm         : chr [1:205] &quot;5000&quot; &quot;5000&quot; &quot;5000&quot; &quot;5500&quot; ...
+##  $ city-mpg         : num [1:205] 21 21 19 24 18 19 19 19 17 16 ...
+##  $ highway-mpg      : num [1:205] 27 27 26 30 22 25 25 25 20 22 ...
+##  $ price            : chr [1:205] &quot;13495&quot; &quot;16500&quot; &quot;16500&quot; &quot;13950&quot; ...
+##  - attr(*, &quot;spec&quot;)=
+##   .. cols(
+##   ..   X1 = col_double(),
+##   ..   X2 = col_character(),
+##   ..   X3 = col_character(),
+##   ..   X4 = col_character(),
+##   ..   X5 = col_character(),
+##   ..   X6 = col_character(),
+##   ..   X7 = col_character(),
+##   ..   X8 = col_character(),
+##   ..   X9 = col_character(),
+##   ..   X10 = col_double(),
+##   ..   X11 = col_double(),
+##   ..   X12 = col_double(),
+##   ..   X13 = col_double(),
+##   ..   X14 = col_double(),
+##   ..   X15 = col_character(),
+##   ..   X16 = col_character(),
+##   ..   X17 = col_double(),
+##   ..   X18 = col_character(),
+##   ..   X19 = col_character(),
+##   ..   X20 = col_character(),
+##   ..   X21 = col_double(),
+##   ..   X22 = col_character(),
+##   ..   X23 = col_character(),
+##   ..   X24 = col_double(),
+##   ..   X25 = col_double(),
+##   ..   X26 = col_character()
+##   .. )
+##  - attr(*, &quot;problems&quot;)=&lt;pointer: 0x000002442c1ffda0&gt;</code></pre>
+<p>Veamos si hay datos faltantes</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" tabindex="-1"></a>colSums</span></code></pre></div>
+<pre><code>## function (x, na.rm = FALSE, dims = 1L) 
+## {
+##     if (is.data.frame(x)) 
+##         x &lt;- as.matrix(x)
+##     if (!is.array(x) || length(dn &lt;- dim(x)) &lt; 2L) 
+##         stop(&quot;&#39;x&#39; must be an array of at least two dimensions&quot;)
+##     if (length(dims) != 1L || dims &lt; 1L || dims &gt; length(dn) - 
+##         1L) 
+##         stop(&quot;invalid &#39;dims&#39;&quot;)
+##     n &lt;- prod(dn[id &lt;- seq_len(dims)])
+##     dn &lt;- dn[-id]
+##     z &lt;- .Internal(colSums(x, n, prod(dn), na.rm))
+##     if (length(dn) &gt; 1L) {
+##         dim(z) &lt;- dn
+##         dimnames(z) &lt;- dimnames(x)[-id]
+##     }
+##     else names(z) &lt;- dimnames(x)[[dims + 1L]]
+##     z
+## }
+## &lt;bytecode: 0x000002442d192d28&gt;
+## &lt;environment: namespace:base&gt;</code></pre>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" tabindex="-1"></a>Automobile[Automobile <span class="sc">==</span> <span class="st">&quot;?&quot;</span>] <span class="ot">&lt;-</span> <span class="cn">NA</span></span>
+<span id="cb11-2"><a href="#cb11-2" tabindex="-1"></a></span>
+<span id="cb11-3"><a href="#cb11-3" tabindex="-1"></a>Automobile <span class="sc">%&gt;%</span></span>
+<span id="cb11-4"><a href="#cb11-4" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="fu">across</span>(<span class="fu">everything</span>(), <span class="sc">~</span> <span class="fu">sum</span>(<span class="fu">is.na</span>(.)),<span class="at">.names =</span> <span class="st">&quot;NA_{.col}&quot;</span>))</span></code></pre></div>
+<pre><code>## # A tibble: 1 × 26
+##   NA_symboling `NA_normalized-losses` NA_make `NA_fuel-type` NA_aspiration
+##          &lt;int&gt;                  &lt;int&gt;   &lt;int&gt;          &lt;int&gt;         &lt;int&gt;
+## 1            0                     41       0              0             0
+## # ℹ 21 more variables: `NA_num-of-doors` &lt;int&gt;, `NA_body-style` &lt;int&gt;,
+## #   `NA_drive-wheels` &lt;int&gt;, `NA_engine-location` &lt;int&gt;, `NA_wheel-base` &lt;int&gt;,
+## #   NA_length &lt;int&gt;, NA_width &lt;int&gt;, NA_height &lt;int&gt;, `NA_curb-weight` &lt;int&gt;,
+## #   `NA_engine-type` &lt;int&gt;, `NA_num-of-cylinders` &lt;int&gt;,
+## #   `NA_engine-size` &lt;int&gt;, `NA_fuel-system` &lt;int&gt;, NA_bore &lt;int&gt;,
+## #   NA_stroke &lt;int&gt;, `NA_compression-ratio` &lt;int&gt;, NA_horsepower &lt;int&gt;,
+## #   `NA_peak-rpm` &lt;int&gt;, `NA_city-mpg` &lt;int&gt;, `NA_highway-mpg` &lt;int&gt;, …</code></pre>
+<p>Ahora, hagamos imputación de datos faltantes</p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" tabindex="-1"></a>Automobile <span class="sc">%&gt;%</span></span>
+<span id="cb13-2"><a href="#cb13-2" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="fu">across</span>(<span class="fu">where</span>(is.character), <span class="sc">~</span> <span class="fu">na_if</span>(., <span class="st">&quot;?&quot;</span>))) <span class="sc">%&gt;%</span></span>
+<span id="cb13-3"><a href="#cb13-3" tabindex="-1"></a>  <span class="fu">type.convert</span>(<span class="at">as.is =</span> <span class="cn">TRUE</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb13-4"><a href="#cb13-4" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="fu">across</span>(<span class="fu">where</span>(is.numeric), <span class="sc">~</span> <span class="fu">ifelse</span>(<span class="fu">is.na</span>(.), <span class="fu">mean</span>(., <span class="at">na.rm =</span> <span class="cn">TRUE</span>), .))) <span class="ot">-&gt;</span> df</span></code></pre></div>
+<p>Verifiquemos si tiene datos faltantes</p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" tabindex="-1"></a>df <span class="sc">%&gt;%</span></span>
+<span id="cb14-2"><a href="#cb14-2" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="fu">across</span>(<span class="fu">everything</span>(), <span class="sc">~</span> <span class="fu">sum</span>(<span class="fu">is.na</span>(.)), <span class="at">.names =</span> <span class="st">&quot;NA_{.col}&quot;</span>))</span></code></pre></div>
+<pre><code>## # A tibble: 1 × 26
+##   NA_symboling `NA_normalized-losses` NA_make `NA_fuel-type` NA_aspiration
+##          &lt;int&gt;                  &lt;int&gt;   &lt;int&gt;          &lt;int&gt;         &lt;int&gt;
+## 1            0                      0       0              0             0
+## # ℹ 21 more variables: `NA_num-of-doors` &lt;int&gt;, `NA_body-style` &lt;int&gt;,
+## #   `NA_drive-wheels` &lt;int&gt;, `NA_engine-location` &lt;int&gt;, `NA_wheel-base` &lt;int&gt;,
+## #   NA_length &lt;int&gt;, NA_width &lt;int&gt;, NA_height &lt;int&gt;, `NA_curb-weight` &lt;int&gt;,
+## #   `NA_engine-type` &lt;int&gt;, `NA_num-of-cylinders` &lt;int&gt;,
+## #   `NA_engine-size` &lt;int&gt;, `NA_fuel-system` &lt;int&gt;, NA_bore &lt;int&gt;,
+## #   NA_stroke &lt;int&gt;, `NA_compression-ratio` &lt;int&gt;, NA_horsepower &lt;int&gt;,
+## #   `NA_peak-rpm` &lt;int&gt;, `NA_city-mpg` &lt;int&gt;, `NA_highway-mpg` &lt;int&gt;, …</code></pre>
+<p>Vamos a convertir la variable ‘fuel-type’ en un factor</p>
+<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" tabindex="-1"></a>df<span class="sc">$</span><span class="st">`</span><span class="at">fuel-type</span><span class="st">`</span> <span class="ot">&lt;-</span> <span class="fu">factor</span>(df<span class="sc">$</span><span class="st">`</span><span class="at">fuel-type</span><span class="st">`</span>)</span></code></pre></div>
+<div id="análisis-exploratorio-de-price-target" class="section level2 hasAnchor" number="1.1">
+<h2><span class="header-section-number">1.1</span> Análisis exploratorio de price (Target)<a href="#an%C3%A1lisis-exploratorio-de-price-target" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>Realicemos el resumen estadístico de la variable</p>
+<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" tabindex="-1"></a>df <span class="sc">%&gt;%</span> <span class="fu">summarise</span>(<span class="at">n =</span> <span class="fu">length</span>(price),</span>
+<span id="cb17-2"><a href="#cb17-2" tabindex="-1"></a>                 <span class="at">media=</span> <span class="fu">mean</span>(price, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb17-3"><a href="#cb17-3" tabindex="-1"></a>                 <span class="at">sd =</span> <span class="fu">sd</span>(price, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb17-4"><a href="#cb17-4" tabindex="-1"></a>                 <span class="at">mediana =</span> <span class="fu">median</span>(price, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb17-5"><a href="#cb17-5" tabindex="-1"></a>                 <span class="at">RIC =</span> <span class="fu">IQR</span>(price, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb17-6"><a href="#cb17-6" tabindex="-1"></a>                 <span class="at">Q1 =</span> <span class="fu">quantile</span>(price, <span class="fl">0.25</span>, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb17-7"><a href="#cb17-7" tabindex="-1"></a>                 <span class="at">Q3 =</span> <span class="fu">quantile</span>(price, <span class="fl">0.75</span>, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb17-8"><a href="#cb17-8" tabindex="-1"></a>                 <span class="at">minimo =</span> <span class="fu">min</span>(price, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb17-9"><a href="#cb17-9" tabindex="-1"></a>                 <span class="at">maximo =</span> <span class="fu">max</span>(price, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb17-10"><a href="#cb17-10" tabindex="-1"></a>                 <span class="at">asimetria =</span> <span class="fu">skewness</span>(price, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb17-11"><a href="#cb17-11" tabindex="-1"></a>                 <span class="at">curtosis =</span> <span class="fu">kurtosis</span>(price, <span class="at">na.rm =</span> <span class="cn">TRUE</span>))</span></code></pre></div>
+<pre><code>## # A tibble: 1 × 11
+##       n  media    sd mediana   RIC    Q1    Q3 minimo maximo asimetria curtosis
+##   &lt;int&gt;  &lt;dbl&gt; &lt;dbl&gt;   &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;
+## 1   205 13207. 7869.   10595  8712  7788 16500   5118  45400      1.81     6.24</code></pre>
+<table>
+<tbody>
+<tr class="odd">
+<td>INTERPRETACION DE ESA TABLA <sup></sup>^</td>
+</tr>
+</tbody>
+</table>
+<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" tabindex="-1"></a>df <span class="sc">%&gt;%</span></span>
+<span id="cb19-2"><a href="#cb19-2" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> <span class="st">`</span><span class="at">fuel-type</span><span class="st">`</span>, <span class="at">y =</span> price, <span class="at">fill =</span> <span class="st">`</span><span class="at">fuel-type</span><span class="st">`</span>)) <span class="sc">+</span></span>
+<span id="cb19-3"><a href="#cb19-3" tabindex="-1"></a>  <span class="fu">geom_boxplot</span>(<span class="at">alpha =</span> <span class="fl">0.7</span>) <span class="sc">+</span></span>
+<span id="cb19-4"><a href="#cb19-4" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">&#39;Distribución del precio según el tipo de combustible&#39;</span>,</span>
+<span id="cb19-5"><a href="#cb19-5" tabindex="-1"></a>       <span class="at">x =</span> <span class="st">&#39;Tipo de Combustible&#39;</span>,</span>
+<span id="cb19-6"><a href="#cb19-6" tabindex="-1"></a>       <span class="at">y =</span> <span class="st">&#39;Precio del auto (USD)&#39;</span>) <span class="sc">+</span></span>
+<span id="cb19-7"><a href="#cb19-7" tabindex="-1"></a>  <span class="fu">theme_bw</span>() <span class="sc">+</span></span>
+<span id="cb19-8"><a href="#cb19-8" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">&quot;none&quot;</span>) <span class="co"># Ocultamos la leyenda porque el eje X ya lo indica</span></span></code></pre></div>
+</div>
+<div id="section" class="section level2 hasAnchor" number="1.2">
+<h2><span class="header-section-number">1.2</span> <img src="bookdown-demo_files/figure-html/histprice-1.png" alt="" width="672" /><a href="#section" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+</div>
+<div id="interpretacion-de-esa-tabla" class="section level2 hasAnchor" number="1.3">
+<h2><span class="header-section-number">1.3</span> INTERPRETACION DE ESA TABLA <sup></sup>^<a href="#interpretacion-de-esa-tabla" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" tabindex="-1"></a>df <span class="sc">%&gt;%</span></span>
+<span id="cb20-2"><a href="#cb20-2" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> price)) <span class="sc">+</span></span>
+<span id="cb20-3"><a href="#cb20-3" tabindex="-1"></a>  <span class="fu">geom_histogram</span>(<span class="fu">aes</span>(<span class="at">y=</span><span class="fu">after_stat</span>(density)),</span>
+<span id="cb20-4"><a href="#cb20-4" tabindex="-1"></a>                 <span class="at">binwidth =</span> <span class="dv">2500</span>,</span>
+<span id="cb20-5"><a href="#cb20-5" tabindex="-1"></a>                 <span class="at">fill =</span> <span class="st">&quot;#9b5e4f&quot;</span>,</span>
+<span id="cb20-6"><a href="#cb20-6" tabindex="-1"></a>                 <span class="at">color =</span> <span class="st">&quot;white&quot;</span>,</span>
+<span id="cb20-7"><a href="#cb20-7" tabindex="-1"></a>                 <span class="at">alpha =</span> <span class="fl">0.7</span>)<span class="sc">+</span></span>
+<span id="cb20-8"><a href="#cb20-8" tabindex="-1"></a>  <span class="fu">geom_density</span>(<span class="at">color=</span><span class="st">&quot;navy&quot;</span>, <span class="at">linewidth =</span> <span class="fl">1.2</span>)<span class="sc">+</span></span>
+<span id="cb20-9"><a href="#cb20-9" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title=</span> <span class="st">&#39;Distribución del precio de los automóviles&#39;</span>,</span>
+<span id="cb20-10"><a href="#cb20-10" tabindex="-1"></a>       <span class="at">x=</span><span class="st">&#39;Precio (USD)&#39;</span>,</span>
+<span id="cb20-11"><a href="#cb20-11" tabindex="-1"></a>       <span class="at">y =</span><span class="st">&#39;Densidad&#39;</span>)<span class="sc">+</span></span>
+<span id="cb20-12"><a href="#cb20-12" tabindex="-1"></a>  <span class="fu">theme_bw</span>()</span></code></pre></div>
+</div>
+<div id="section-1" class="section level2 hasAnchor" number="1.4">
+<h2><span class="header-section-number">1.4</span> <img src="bookdown-demo_files/figure-html/unnamed-chunk-2-1.png" alt="" width="672" /><a href="#section-1" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+</div>
+<div id="interpretacion-de-esa-tabla-1" class="section level2 hasAnchor" number="1.5">
+<h2><span class="header-section-number">1.5</span> INTERPRETACION DE ESA TABLA <sup></sup>^<a href="#interpretacion-de-esa-tabla-1" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" tabindex="-1"></a>df <span class="sc">%&gt;%</span></span>
+<span id="cb21-2"><a href="#cb21-2" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">y=</span> <span class="st">&quot;&quot;</span>, <span class="at">x=</span>price))<span class="sc">+</span></span>
+<span id="cb21-3"><a href="#cb21-3" tabindex="-1"></a>  <span class="fu">geom_boxplot</span>(<span class="at">fill =</span> <span class="st">&quot;#9b5e4f&quot;</span>,<span class="at">color =</span> <span class="st">&quot;#9b324f&quot;</span>,</span>
+<span id="cb21-4"><a href="#cb21-4" tabindex="-1"></a>               <span class="at">outlier.color =</span> <span class="st">&#39;#e74c3c&#39;</span>)<span class="sc">+</span></span>
+<span id="cb21-5"><a href="#cb21-5" tabindex="-1"></a>  <span class="fu">stat_summary</span>(<span class="at">fun=</span> mean, <span class="at">geom=</span><span class="st">&#39;point&#39;</span>, <span class="at">shape=</span><span class="dv">20</span>,</span>
+<span id="cb21-6"><a href="#cb21-6" tabindex="-1"></a>               <span class="at">size=</span><span class="dv">4</span>, <span class="at">color=</span><span class="st">&#39;navy&#39;</span>) <span class="sc">+</span></span>
+<span id="cb21-7"><a href="#cb21-7" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">&quot;Dispersión y valores atípicos del precio&quot;</span>, <span class="at">x =</span> <span class="st">&quot;Precio&quot;</span>, <span class="at">y =</span> <span class="st">&quot;&quot;</span>) <span class="sc">+</span></span>
+<span id="cb21-8"><a href="#cb21-8" tabindex="-1"></a>  <span class="fu">theme_bw</span>()</span></code></pre></div>
+</div>
+<div id="section-2" class="section level2 hasAnchor" number="1.6">
+<h2><span class="header-section-number">1.6</span> <img src="bookdown-demo_files/figure-html/unnamed-chunk-3-1.png" alt="" width="672" /><a href="#section-2" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+</div>
+<div id="interpretacion-de-esa-tabla-2" class="section level2 hasAnchor" number="1.7">
+<h2><span class="header-section-number">1.7</span> INTERPRETACION DE ESA TABLA <sup></sup>^<a href="#interpretacion-de-esa-tabla-2" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+</div>
+<div id="análisis-de-las-variables-numéricas-independientes" class="section level2 hasAnchor" number="1.8">
+<h2><span class="header-section-number">1.8</span> Análisis de las variables numéricas independientes<a href="#an%C3%A1lisis-de-las-variables-num%C3%A9ricas-independientes" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" tabindex="-1"></a>df <span class="sc">%&gt;%</span></span>
+<span id="cb22-2"><a href="#cb22-2" tabindex="-1"></a>  <span class="fu">select</span>(<span class="st">`</span><span class="at">engine-size</span><span class="st">`</span>, horsepower, <span class="st">`</span><span class="at">city-mpg</span><span class="st">`</span>, <span class="st">`</span><span class="at">curb-weight</span><span class="st">`</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb22-3"><a href="#cb22-3" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(</span>
+<span id="cb22-4"><a href="#cb22-4" tabindex="-1"></a>    <span class="at">cols=</span><span class="fu">everything</span>(),</span>
+<span id="cb22-5"><a href="#cb22-5" tabindex="-1"></a>    <span class="at">names_to=</span> <span class="st">&#39;variable&#39;</span>,</span>
+<span id="cb22-6"><a href="#cb22-6" tabindex="-1"></a>    <span class="at">values_to=</span> <span class="st">&#39;valor&#39;</span></span>
+<span id="cb22-7"><a href="#cb22-7" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb22-8"><a href="#cb22-8" tabindex="-1"></a>  <span class="fu">group_by</span>(variable) <span class="sc">%&gt;%</span></span>
+<span id="cb22-9"><a href="#cb22-9" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">n =</span> <span class="fu">length</span>(valor),</span>
+<span id="cb22-10"><a href="#cb22-10" tabindex="-1"></a>                 <span class="at">media=</span> <span class="fu">mean</span>(valor, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb22-11"><a href="#cb22-11" tabindex="-1"></a>                 <span class="at">sd =</span> <span class="fu">sd</span>(valor, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb22-12"><a href="#cb22-12" tabindex="-1"></a>                 <span class="at">mediana =</span> <span class="fu">median</span>(valor, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb22-13"><a href="#cb22-13" tabindex="-1"></a>                 <span class="at">RIC =</span> <span class="fu">IQR</span>(valor, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb22-14"><a href="#cb22-14" tabindex="-1"></a>                 <span class="at">minimo =</span> <span class="fu">min</span>(valor, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb22-15"><a href="#cb22-15" tabindex="-1"></a>                 <span class="at">maximo =</span> <span class="fu">max</span>(valor, <span class="at">na.rm =</span> <span class="cn">TRUE</span>))</span></code></pre></div>
+<pre><code>## # A tibble: 4 × 8
+##   variable        n  media     sd mediana   RIC minimo maximo
+##   &lt;chr&gt;       &lt;int&gt;  &lt;dbl&gt;  &lt;dbl&gt;   &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;
+## 1 city-mpg      205   25.2   6.54      24    11     13     49
+## 2 curb-weight   205 2556.  521.      2414   790   1488   4066
+## 3 engine-size   205  127.   41.6      120    44     61    326
+## 4 horsepower    205  104.   39.5       95    46     48    288</code></pre>
+<table>
+<tbody>
+<tr class="odd">
+<td>INTERPRETACION DE ESA TABLA <sup></sup>^</td>
+</tr>
+</tbody>
+</table>
+<div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" tabindex="-1"></a><span class="co"># Usamos patchwork para unir los gráficos</span></span>
+<span id="cb24-2"><a href="#cb24-2" tabindex="-1"></a>p1 <span class="ot">&lt;-</span> df <span class="sc">%&gt;%</span></span>
+<span id="cb24-3"><a href="#cb24-3" tabindex="-1"></a>    <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">y=</span> <span class="st">&quot;&quot;</span>, <span class="at">x=</span><span class="st">`</span><span class="at">engine-size</span><span class="st">`</span>))<span class="sc">+</span></span>
+<span id="cb24-4"><a href="#cb24-4" tabindex="-1"></a>  <span class="fu">geom_boxplot</span>(<span class="at">fill =</span> <span class="st">&quot;#e67e22&quot;</span>,<span class="at">color =</span> <span class="st">&quot;darkred&quot;</span>, <span class="at">outlier.color =</span> <span class="st">&#39;black&#39;</span>)<span class="sc">+</span></span>
+<span id="cb24-5"><a href="#cb24-5" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">&quot;Tamaño del Motor&quot;</span>, <span class="at">y =</span> <span class="st">&quot;&quot;</span>, <span class="at">x =</span> <span class="st">&quot;Cilindrada&quot;</span>) <span class="sc">+</span> <span class="fu">theme_bw</span>()</span>
+<span id="cb24-6"><a href="#cb24-6" tabindex="-1"></a></span>
+<span id="cb24-7"><a href="#cb24-7" tabindex="-1"></a>p2 <span class="ot">&lt;-</span> df <span class="sc">%&gt;%</span></span>
+<span id="cb24-8"><a href="#cb24-8" tabindex="-1"></a>    <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">y=</span> <span class="st">&quot;&quot;</span>, <span class="at">x=</span>horsepower))<span class="sc">+</span></span>
+<span id="cb24-9"><a href="#cb24-9" tabindex="-1"></a>  <span class="fu">geom_boxplot</span>(<span class="at">fill =</span> <span class="st">&quot;#e67e22&quot;</span>,<span class="at">color =</span> <span class="st">&quot;darkred&quot;</span>, <span class="at">outlier.color =</span> <span class="st">&#39;black&#39;</span>)<span class="sc">+</span></span>
+<span id="cb24-10"><a href="#cb24-10" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">&quot;Caballos de Fuerza&quot;</span>, <span class="at">y =</span> <span class="st">&quot;&quot;</span>, <span class="at">x =</span> <span class="st">&quot;HP&quot;</span>) <span class="sc">+</span> <span class="fu">theme_bw</span>()</span>
+<span id="cb24-11"><a href="#cb24-11" tabindex="-1"></a></span>
+<span id="cb24-12"><a href="#cb24-12" tabindex="-1"></a>p3 <span class="ot">&lt;-</span> df <span class="sc">%&gt;%</span></span>
+<span id="cb24-13"><a href="#cb24-13" tabindex="-1"></a>    <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">y=</span> <span class="st">&quot;&quot;</span>, <span class="at">x=</span><span class="st">`</span><span class="at">city-mpg</span><span class="st">`</span>))<span class="sc">+</span></span>
+<span id="cb24-14"><a href="#cb24-14" tabindex="-1"></a>  <span class="fu">geom_boxplot</span>(<span class="at">fill =</span> <span class="st">&quot;#e67e22&quot;</span>,<span class="at">color =</span> <span class="st">&quot;darkred&quot;</span>, <span class="at">outlier.color =</span> <span class="st">&#39;black&#39;</span>)<span class="sc">+</span></span>
+<span id="cb24-15"><a href="#cb24-15" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">&quot;Rendimiento en Ciudad&quot;</span>, <span class="at">y =</span> <span class="st">&quot;&quot;</span>, <span class="at">x =</span> <span class="st">&quot;Millas por Galón&quot;</span>) <span class="sc">+</span> <span class="fu">theme_bw</span>()</span>
+<span id="cb24-16"><a href="#cb24-16" tabindex="-1"></a></span>
+<span id="cb24-17"><a href="#cb24-17" tabindex="-1"></a>p4 <span class="ot">&lt;-</span> df <span class="sc">%&gt;%</span></span>
+<span id="cb24-18"><a href="#cb24-18" tabindex="-1"></a>    <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">y=</span> <span class="st">&quot;&quot;</span>, <span class="at">x=</span><span class="st">`</span><span class="at">curb-weight</span><span class="st">`</span>))<span class="sc">+</span></span>
+<span id="cb24-19"><a href="#cb24-19" tabindex="-1"></a>  <span class="fu">geom_boxplot</span>(<span class="at">fill =</span> <span class="st">&quot;#e67e22&quot;</span>,<span class="at">color =</span> <span class="st">&quot;darkred&quot;</span>, <span class="at">outlier.color =</span> <span class="st">&#39;black&#39;</span>)<span class="sc">+</span></span>
+<span id="cb24-20"><a href="#cb24-20" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">&quot;Peso del Vehículo&quot;</span>, <span class="at">y =</span> <span class="st">&quot;&quot;</span>, <span class="at">x =</span> <span class="st">&quot;Libras&quot;</span>) <span class="sc">+</span> <span class="fu">theme_bw</span>()</span>
+<span id="cb24-21"><a href="#cb24-21" tabindex="-1"></a></span>
+<span id="cb24-22"><a href="#cb24-22" tabindex="-1"></a>p1 <span class="sc">+</span> p2 <span class="sc">+</span> p3 <span class="sc">+</span> p4</span></code></pre></div>
+</div>
+<div id="section-3" class="section level2 hasAnchor" number="1.9">
+<h2><span class="header-section-number">1.9</span> <img src="bookdown-demo_files/figure-html/unnamed-chunk-4-1.png" alt="" width="672" /><a href="#section-3" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+</div>
+<div id="interpretacion-de-esa-tabla-3" class="section level2 hasAnchor" number="1.10">
+<h2><span class="header-section-number">1.10</span> INTERPRETACION DE ESA TABLA <sup></sup>^<a href="#interpretacion-de-esa-tabla-3" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+</div>
+<div id="análisis-de-variable-categórica-body-style" class="section level2 hasAnchor" number="1.11">
+<h2><span class="header-section-number">1.11</span> Análisis de variable categórica: body-style<a href="#an%C3%A1lisis-de-variable-categ%C3%B3rica-body-style" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" tabindex="-1"></a>tabla_body <span class="ot">&lt;-</span> df <span class="sc">%&gt;%</span></span>
+<span id="cb25-2"><a href="#cb25-2" tabindex="-1"></a>  <span class="fu">count</span>(<span class="st">`</span><span class="at">body-style</span><span class="st">`</span>, <span class="at">name =</span> <span class="st">&quot;n&quot;</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb25-3"><a href="#cb25-3" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Porcentaje =</span> <span class="fu">round</span>((n <span class="sc">/</span> <span class="fu">sum</span>(n))<span class="sc">*</span><span class="dv">100</span>,<span class="dv">1</span>),</span>
+<span id="cb25-4"><a href="#cb25-4" tabindex="-1"></a>         <span class="at">Etiqueta =</span> <span class="fu">paste0</span>(n,<span class="st">&quot; (&quot;</span>,Porcentaje,<span class="st">&quot;%)&quot;</span>))</span>
+<span id="cb25-5"><a href="#cb25-5" tabindex="-1"></a></span>
+<span id="cb25-6"><a href="#cb25-6" tabindex="-1"></a>tabla_body <span class="sc">%&gt;%</span></span>
+<span id="cb25-7"><a href="#cb25-7" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x=</span> <span class="fu">reorder</span>(<span class="st">`</span><span class="at">body-style</span><span class="st">`</span>, <span class="sc">-</span>n), <span class="at">y=</span>n))<span class="sc">+</span></span>
+<span id="cb25-8"><a href="#cb25-8" tabindex="-1"></a>  <span class="fu">geom_col</span>(<span class="at">fill=</span> <span class="st">&quot;#9b5e4f&quot;</span>, <span class="at">width=</span><span class="fl">0.6</span>)<span class="sc">+</span></span>
+<span id="cb25-9"><a href="#cb25-9" tabindex="-1"></a>  <span class="fu">geom_text</span>(<span class="fu">aes</span>(<span class="at">label=</span> Etiqueta), <span class="at">vjust=</span><span class="sc">-</span><span class="fl">0.5</span>, <span class="at">size=</span><span class="dv">4</span>)<span class="sc">+</span></span>
+<span id="cb25-10"><a href="#cb25-10" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">&quot;Distribución por Tipo de Carrocería&quot;</span>, <span class="at">x =</span> <span class="st">&quot;Estilo de Carrocería&quot;</span>, <span class="at">y =</span> <span class="st">&quot;Cantidad&quot;</span>) <span class="sc">+</span></span>
+<span id="cb25-11"><a href="#cb25-11" tabindex="-1"></a>  <span class="fu">scale_y_continuous</span>(<span class="at">expand =</span> <span class="fu">expansion</span>(<span class="at">mult=</span><span class="fu">c</span>(<span class="dv">0</span>,<span class="fl">0.15</span>)))<span class="sc">+</span></span>
+<span id="cb25-12"><a href="#cb25-12" tabindex="-1"></a>  <span class="fu">theme_bw</span>()</span></code></pre></div>
+</div>
+<div id="section-4" class="section level2 hasAnchor" number="1.12">
+<h2><span class="header-section-number">1.12</span> <img src="bookdown-demo_files/figure-html/var_categorica-1.png" alt="" width="672" /><a href="#section-4" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+</div>
+<div id="interpretacion-de-esa-tabla-4" class="section level2 hasAnchor" number="1.13">
+<h2><span class="header-section-number">1.13</span> INTERPRETACION DE ESA TABLA <sup></sup>^<a href="#interpretacion-de-esa-tabla-4" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+</div>
+<div id="análisis-exploratorio-bivariado" class="section level2 hasAnchor" number="1.14">
+<h2><span class="header-section-number">1.14</span> Análisis Exploratorio Bivariado<a href="#an%C3%A1lisis-exploratorio-bivariado" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" tabindex="-1"></a><span class="co"># Relación entre tamaño del motor y precio</span></span>
+<span id="cb26-2"><a href="#cb26-2" tabindex="-1"></a>df <span class="sc">%&gt;%</span></span>
+<span id="cb26-3"><a href="#cb26-3" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x=</span><span class="st">`</span><span class="at">engine-size</span><span class="st">`</span>, <span class="at">y=</span>price)) <span class="sc">+</span></span>
+<span id="cb26-4"><a href="#cb26-4" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">alpha=</span><span class="fl">0.6</span>, <span class="at">color=</span><span class="st">&#39;#2980b9&#39;</span>, <span class="at">size=</span><span class="dv">2</span>) <span class="sc">+</span></span>
+<span id="cb26-5"><a href="#cb26-5" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(<span class="at">method =</span> <span class="st">&quot;lm&quot;</span>, <span class="at">color =</span> <span class="st">&quot;#c0392b&quot;</span>, <span class="at">se =</span> <span class="cn">FALSE</span>) <span class="sc">+</span></span>
+<span id="cb26-6"><a href="#cb26-6" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">&#39;Relación entre el tamaño del motor y el precio&#39;</span>,</span>
+<span id="cb26-7"><a href="#cb26-7" tabindex="-1"></a>       <span class="at">x=</span><span class="st">&#39;Tamaño del Motor&#39;</span>,</span>
+<span id="cb26-8"><a href="#cb26-8" tabindex="-1"></a>       <span class="at">y=</span><span class="st">&#39;Precio (USD)&#39;</span>) <span class="sc">+</span></span>
+<span id="cb26-9"><a href="#cb26-9" tabindex="-1"></a>  <span class="fu">theme_bw</span>()</span></code></pre></div>
+<pre><code>## `geom_smooth()` using formula = &#39;y ~ x&#39;</code></pre>
+</div>
+<div id="section-5" class="section level2 hasAnchor" number="1.15">
+<h2><span class="header-section-number">1.15</span> <img src="bookdown-demo_files/figure-html/bi_num_vs_target-1.png" alt="" width="672" /><a href="#section-5" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+</div>
+<div id="interpretacion-de-esa-tabla-5" class="section level2 hasAnchor" number="1.16">
+<h2><span class="header-section-number">1.16</span> INTERPRETACION DE ESA TABLA <sup></sup>^<a href="#interpretacion-de-esa-tabla-5" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<div class="sourceCode" id="cb28"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" tabindex="-1"></a><span class="co"># Relación entre estilo de carrocería y precio</span></span>
+<span id="cb28-2"><a href="#cb28-2" tabindex="-1"></a>df <span class="sc">%&gt;%</span></span>
+<span id="cb28-3"><a href="#cb28-3" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> <span class="st">`</span><span class="at">body-style</span><span class="st">`</span>, <span class="at">y=</span> price, <span class="at">fill =</span> <span class="st">`</span><span class="at">body-style</span><span class="st">`</span>))<span class="sc">+</span></span>
+<span id="cb28-4"><a href="#cb28-4" tabindex="-1"></a>  <span class="fu">geom_boxplot</span>(<span class="at">color =</span> <span class="st">&quot;black&quot;</span>, <span class="at">outlier.color =</span> <span class="st">&#39;red&#39;</span>, <span class="at">alpha =</span> <span class="fl">0.8</span>) <span class="sc">+</span></span>
+<span id="cb28-5"><a href="#cb28-5" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">&quot;Distribución del Precio según la Carrocería&quot;</span>, <span class="at">x =</span> <span class="st">&quot;Estilo&quot;</span>, <span class="at">y =</span> <span class="st">&quot;Precio (USD)&quot;</span>) <span class="sc">+</span></span>
+<span id="cb28-6"><a href="#cb28-6" tabindex="-1"></a>  <span class="fu">theme_bw</span>() <span class="sc">+</span></span>
+<span id="cb28-7"><a href="#cb28-7" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">&quot;none&quot;</span>)</span></code></pre></div>
+</div>
+<div id="section-6" class="section level2 hasAnchor" number="1.17">
+<h2><span class="header-section-number">1.17</span> <img src="bookdown-demo_files/figure-html/unnamed-chunk-5-1.png" alt="" width="672" /><a href="#section-6" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+</div>
+<div id="interpretacion-de-esa-tabla-6" class="section level2 hasAnchor" number="1.18">
+<h2><span class="header-section-number">1.18</span> INTERPRETACION DE ESA TABLA <sup></sup>^<a href="#interpretacion-de-esa-tabla-6" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+</div>
+<div id="feature-engineering-nuevas-variables" class="section level2 hasAnchor" number="1.19">
+<h2><span class="header-section-number">1.19</span> Feature Engineering (Nuevas Variables)<a href="#feature-engineering-nuevas-variables" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>Para reducir la correlación y encontrar mejores predictores, crearemos nuevas variables como el promedio de rendimiento de combustible y la relación peso-potencia.</p>
+<div class="sourceCode" id="cb29"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" tabindex="-1"></a><span class="co"># Promedio de rendimiento de combustible (ciudad y carretera)</span></span>
+<span id="cb29-2"><a href="#cb29-2" tabindex="-1"></a>df<span class="sc">$</span>avg_mpg <span class="ot">&lt;-</span> (df<span class="sc">$</span><span class="st">`</span><span class="at">city-mpg</span><span class="st">`</span> <span class="sc">+</span> df<span class="sc">$</span><span class="st">`</span><span class="at">highway-mpg</span><span class="st">`</span>) <span class="sc">/</span> <span class="dv">2</span></span>
+<span id="cb29-3"><a href="#cb29-3" tabindex="-1"></a></span>
+<span id="cb29-4"><a href="#cb29-4" tabindex="-1"></a><span class="co"># Relación peso-potencia (peso dividido por caballos de fuerza)</span></span>
+<span id="cb29-5"><a href="#cb29-5" tabindex="-1"></a>df<span class="sc">$</span>weight_power_ratio <span class="ot">&lt;-</span> df<span class="sc">$</span><span class="st">`</span><span class="at">curb-weight</span><span class="st">`</span> <span class="sc">/</span> df<span class="sc">$</span>horsepower</span>
+<span id="cb29-6"><a href="#cb29-6" tabindex="-1"></a></span>
+<span id="cb29-7"><a href="#cb29-7" tabindex="-1"></a><span class="co"># Verificamos la correlación con el precio</span></span>
+<span id="cb29-8"><a href="#cb29-8" tabindex="-1"></a><span class="fu">cor</span>(df[, <span class="fu">c</span>(<span class="st">&quot;price&quot;</span>, <span class="st">&quot;avg_mpg&quot;</span>, <span class="st">&quot;weight_power_ratio&quot;</span>)], <span class="at">use =</span> <span class="st">&quot;complete.obs&quot;</span>)</span></code></pre></div>
+<pre><code>##                         price    avg_mpg weight_power_ratio
+## price               1.0000000 -0.6842006         -0.4151810
+## avg_mpg            -0.6842006  1.0000000          0.6120429
+## weight_power_ratio -0.4151810  0.6120429          1.0000000</code></pre>
+<table>
+<tbody>
+<tr class="odd">
+<td>INTERPRETACION DE ESA TABLA <sup></sup>^</td>
+</tr>
+</tbody>
+</table>
+<div class="sourceCode" id="cb31"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" tabindex="-1"></a><span class="co"># Verificamos las relaciones visualmente con GGally</span></span>
+<span id="cb31-2"><a href="#cb31-2" tabindex="-1"></a><span class="fu">ggpairs</span>(df[, <span class="fu">c</span>(<span class="st">&quot;price&quot;</span>, <span class="st">&quot;horsepower&quot;</span>, <span class="st">&quot;avg_mpg&quot;</span>, <span class="st">&quot;weight_power_ratio&quot;</span>)])</span></code></pre></div>
+</div>
+<div id="section-7" class="section level2 hasAnchor" number="1.20">
+<h2><span class="header-section-number">1.20</span> <img src="bookdown-demo_files/figure-html/unnamed-chunk-6-1.png" alt="" width="672" /><a href="#section-7" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+</div>
+<div id="interpretacion-de-esa-tabla-7" class="section level2 hasAnchor" number="1.21">
+<h2><span class="header-section-number">1.21</span> INTERPRETACION DE ESA TABLA <sup></sup>^<a href="#interpretacion-de-esa-tabla-7" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+
+
+
+
+
+
+</div>
+</div>
+            </section>
+
+          </div>
+        </div>
+      </div>
+
+
+    </div>
+  </div>
+<script src="libs/gitbook-2.6.7/js/app.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/clipboard.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-bookdown.js"></script>
+<script src="libs/gitbook-2.6.7/js/jquery.highlight.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-clipboard.js"></script>
+<script>
+gitbook.require(["gitbook"], function(gitbook) {
+gitbook.start({
+  "sharing": {
+    "github": false,
+    "facebook": true,
+    "twitter": true,
+    "linkedin": false,
+    "weibo": false,
+    "instapaper": false,
+    "vk": false,
+    "whatsapp": false,
+    "all": ["facebook", "twitter", "linkedin", "weibo", "instapaper"]
+  },
+  "fontsettings": {
+    "theme": "white",
+    "family": "sans",
+    "size": 2
+  },
+  "edit": {
+    "link": "https://github.com/rstudio/bookdown-demo/edit/master/01-intro.Rmd",
+    "text": "Edit"
+  },
+  "history": {
+    "link": null,
+    "text": null
+  },
+  "view": {
+    "link": null,
+    "text": null
+  },
+  "download": ["bookdown-demo.pdf", "bookdown-demo.epub"],
+  "search": {
+    "engine": "fuse",
+    "options": null
+  },
+  "toc": {
+    "collapse": "subsection"
+  }
+});
+});
+</script>
+
+</body>
+
+</html>

@@ -7,6 +7,9 @@ library(moments)
 library(patchwork)
 library(GGally)
 library(readr)
+library(dplyr)
+library(moments) 
+library(ggplot2)
 ```
 
 ```{r}
@@ -23,7 +26,240 @@ colnames(Automobile) <- c(
   "city-mpg", "highway-mpg", "price"
 )
 
-View(Automobile)
+ 
 ```
 
 
+Muestrame las 5 primeras filas
+```{r filas}
+head(Automobile, n=5)
+```
+
+La estructura de los datos
+```{r estructura}
+str(Automobile)
+```
+
+Veamos si hay datos faltantes
+```{r faltantes}
+colSums
+Automobile[Automobile == "?"] <- NA
+
+Automobile %>%
+  summarise(across(everything(), ~ sum(is.na(.)),.names = "NA_{.col}"))
+```
+
+Ahora, hagamos imputación de datos faltantes
+```{r imp}
+Automobile %>%
+  mutate(across(where(is.character), ~ na_if(., "?"))) %>%
+  type.convert(as.is = TRUE) %>%
+  mutate(across(where(is.numeric), ~ ifelse(is.na(.), mean(., na.rm = TRUE), .))) -> df
+```
+
+Verifiquemos si tiene datos faltantes
+```{r faltantes2}
+df %>%
+  summarise(across(everything(), ~ sum(is.na(.)), .names = "NA_{.col}"))
+```
+
+Vamos a convertir la variable 'fuel-type' en un factor
+```{r factofuel}
+df$`fuel-type` <- factor(df$`fuel-type`)
+```
+
+## Análisis exploratorio de price (Target)
+
+Realicemos el resumen estadístico de la variable
+```{r stats_price}
+df %>% summarise(n = length(price),
+                 media= mean(price, na.rm = TRUE),
+                 sd = sd(price, na.rm = TRUE),
+                 mediana = median(price, na.rm = TRUE),
+                 RIC = IQR(price, na.rm = TRUE),
+                 Q1 = quantile(price, 0.25, na.rm = TRUE),
+                 Q3 = quantile(price, 0.75, na.rm = TRUE),
+                 minimo = min(price, na.rm = TRUE),
+                 maximo = max(price, na.rm = TRUE),
+                 asimetria = skewness(price, na.rm = TRUE),
+                 curtosis = kurtosis(price, na.rm = TRUE))
+```
+-------------------------------------
+INTERPRETACION DE ESA TABLA ^^^^^^^^^
+-------------------------------------
+
+```{r histprice}
+df %>%
+  ggplot(aes(x = `fuel-type`, y = price, fill = `fuel-type`)) +
+  geom_boxplot(alpha = 0.7) +
+  labs(title = 'Distribución del precio según el tipo de combustible',
+       x = 'Tipo de Combustible',
+       y = 'Precio del auto (USD)') +
+  theme_bw() +
+  theme(legend.position = "none") # Ocultamos la leyenda porque el eje X ya lo indica
+```
+-------------------------------------
+INTERPRETACION DE ESA TABLA ^^^^^^^^^
+-------------------------------------
+
+```{r}
+df %>%
+  ggplot(aes(x = price)) +
+  geom_histogram(aes(y=after_stat(density)),
+                 binwidth = 2500,
+                 fill = "#9b5e4f",
+                 color = "white",
+                 alpha = 0.7)+
+  geom_density(color="navy", linewidth = 1.2)+
+  labs(title= 'Distribución del precio de los automóviles',
+       x='Precio (USD)',
+       y ='Densidad')+
+  theme_bw()
+```
+-------------------------------------
+INTERPRETACION DE ESA TABLA ^^^^^^^^^
+-------------------------------------
+
+```{r}
+df %>%
+  ggplot(aes(y= "", x=price))+
+  geom_boxplot(fill = "#9b5e4f",color = "#9b324f",
+               outlier.color = '#e74c3c')+
+  stat_summary(fun= mean, geom='point', shape=20,
+               size=4, color='navy') +
+  labs(title = "Dispersión y valores atípicos del precio", x = "Precio", y = "") +
+  theme_bw()
+```
+-------------------------------------
+INTERPRETACION DE ESA TABLA ^^^^^^^^^
+-------------------------------------
+
+## Análisis de las variables numéricas independientes
+
+```{r var_indep_num}
+
+df %>%
+  select(`engine-size`, horsepower, `city-mpg`, `curb-weight`) %>%
+  pivot_longer(
+    cols=everything(),
+    names_to= 'variable',
+    values_to= 'valor'
+  ) %>%
+  group_by(variable) %>%
+  summarise(n = length(valor),
+                 media= mean(valor, na.rm = TRUE),
+                 sd = sd(valor, na.rm = TRUE),
+                 mediana = median(valor, na.rm = TRUE),
+                 RIC = IQR(valor, na.rm = TRUE),
+                 minimo = min(valor, na.rm = TRUE),
+                 maximo = max(valor, na.rm = TRUE))
+```
+-------------------------------------
+INTERPRETACION DE ESA TABLA ^^^^^^^^^
+-------------------------------------
+
+```{r}
+# Usamos patchwork para unir los gráficos
+p1 <- df %>%
+    ggplot(aes(y= "", x=`engine-size`))+
+  geom_boxplot(fill = "#e67e22",color = "darkred", outlier.color = 'black')+
+  labs(title = "Tamaño del Motor", y = "", x = "Cilindrada") + theme_bw()
+
+p2 <- df %>%
+    ggplot(aes(y= "", x=horsepower))+
+  geom_boxplot(fill = "#e67e22",color = "darkred", outlier.color = 'black')+
+  labs(title = "Caballos de Fuerza", y = "", x = "HP") + theme_bw()
+
+p3 <- df %>%
+    ggplot(aes(y= "", x=`city-mpg`))+
+  geom_boxplot(fill = "#e67e22",color = "darkred", outlier.color = 'black')+
+  labs(title = "Rendimiento en Ciudad", y = "", x = "Millas por Galón") + theme_bw()
+
+p4 <- df %>%
+    ggplot(aes(y= "", x=`curb-weight`))+
+  geom_boxplot(fill = "#e67e22",color = "darkred", outlier.color = 'black')+
+  labs(title = "Peso del Vehículo", y = "", x = "Libras") + theme_bw()
+
+p1 + p2 + p3 + p4
+```
+-------------------------------------
+INTERPRETACION DE ESA TABLA ^^^^^^^^^
+-------------------------------------
+
+## Análisis de variable categórica: body-style
+
+
+```{r var_categorica}
+tabla_body <- df %>%
+  count(`body-style`, name = "n") %>%
+  mutate(Porcentaje = round((n / sum(n))*100,1),
+         Etiqueta = paste0(n," (",Porcentaje,"%)"))
+
+tabla_body %>%
+  ggplot(aes(x= reorder(`body-style`, -n), y=n))+
+  geom_col(fill= "#9b5e4f", width=0.6)+
+  geom_text(aes(label= Etiqueta), vjust=-0.5, size=4)+
+  labs(title = "Distribución por Tipo de Carrocería", x = "Estilo de Carrocería", y = "Cantidad") +
+  scale_y_continuous(expand = expansion(mult=c(0,0.15)))+
+  theme_bw()
+```
+-------------------------------------
+INTERPRETACION DE ESA TABLA ^^^^^^^^^
+-------------------------------------
+
+## Análisis Exploratorio Bivariado
+
+```{r bi_num_vs_target}
+# Relación entre tamaño del motor y precio
+df %>%
+  ggplot(aes(x=`engine-size`, y=price)) +
+  geom_point(alpha=0.6, color='#2980b9', size=2) +
+  geom_smooth(method = "lm", color = "#c0392b", se = FALSE) +
+  labs(title = 'Relación entre el tamaño del motor y el precio',
+       x='Tamaño del Motor',
+       y='Precio (USD)') +
+  theme_bw()
+```
+-------------------------------------
+INTERPRETACION DE ESA TABLA ^^^^^^^^^
+-------------------------------------
+
+```{r}
+# Relación entre estilo de carrocería y precio
+df %>%
+  ggplot(aes(x = `body-style`, y= price, fill = `body-style`))+
+  geom_boxplot(color = "black", outlier.color = 'red', alpha = 0.8) +
+  labs(title = "Distribución del Precio según la Carrocería", x = "Estilo", y = "Precio (USD)") +
+  theme_bw() +
+  theme(legend.position = "none")
+```
+-------------------------------------
+INTERPRETACION DE ESA TABLA ^^^^^^^^^
+-------------------------------------
+
+## Feature Engineering (Nuevas Variables)
+
+
+Para reducir la correlación y encontrar mejores predictores, crearemos nuevas variables como el promedio de rendimiento de combustible y la relación peso-potencia.
+
+```{r nuevas_variables_autos}
+# Promedio de rendimiento de combustible (ciudad y carretera)
+df$avg_mpg <- (df$`city-mpg` + df$`highway-mpg`) / 2
+
+# Relación peso-potencia (peso dividido por caballos de fuerza)
+df$weight_power_ratio <- df$`curb-weight` / df$horsepower
+
+# Verificamos la correlación con el precio
+cor(df[, c("price", "avg_mpg", "weight_power_ratio")], use = "complete.obs")
+```
+-------------------------------------
+INTERPRETACION DE ESA TABLA ^^^^^^^^^
+-------------------------------------
+
+```{r}
+# Verificamos las relaciones visualmente con GGally
+ggpairs(df[, c("price", "horsepower", "avg_mpg", "weight_power_ratio")])
+```
+-------------------------------------
+INTERPRETACION DE ESA TABLA ^^^^^^^^^
+-------------------------------------
