@@ -90,13 +90,12 @@ INTERPRETACION DE ESA TABLA ^^^^^^^^^
 
 ```{r histprice}
 df %>%
-  ggplot(aes(x = `fuel-type`, y = price, fill = `fuel-type`)) +
-  geom_boxplot(alpha = 0.7) +
+  ggplot(aes(x = `fuel-type`, y = price)) +
+  geom_boxplot(fill = "#9b5e4f", alpha = 0.7) +
   labs(title = 'Distribución del precio según el tipo de combustible',
        x = 'Tipo de Combustible',
        y = 'Precio del auto (USD)') +
-  theme_bw() +
-  theme(legend.position = "none") # Ocultamos la leyenda porque el eje X ya lo indica
+  theme_bw()
 ```
 -------------------------------------
 INTERPRETACION DE ESA TABLA ^^^^^^^^^
@@ -110,7 +109,7 @@ df %>%
                  fill = "#9b5e4f",
                  color = "white",
                  alpha = 0.7)+
-  geom_density(color="navy", linewidth = 1.2)+
+  geom_density(color="brown", linewidth = 1.2)+
   labs(title= 'Distribución del precio de los automóviles',
        x='Precio (USD)',
        y ='Densidad')+
@@ -123,10 +122,10 @@ INTERPRETACION DE ESA TABLA ^^^^^^^^^
 ```{r}
 df %>%
   ggplot(aes(y= "", x=price))+
-  geom_boxplot(fill = "#9b5e4f",color = "#9b324f",
+  geom_boxplot(fill = "#9b5e4f",color = "brown",
                outlier.color = '#e74c3c')+
   stat_summary(fun= mean, geom='point', shape=20,
-               size=4, color='navy') +
+               size=4, color='darkred') +
   labs(title = "Dispersión y valores atípicos del precio", x = "Precio", y = "") +
   theme_bw()
 ```
@@ -162,22 +161,22 @@ INTERPRETACION DE ESA TABLA ^^^^^^^^^
 # Usamos patchwork para unir los gráficos
 p1 <- df %>%
     ggplot(aes(y= "", x=`engine-size`))+
-  geom_boxplot(fill = "#e67e22",color = "darkred", outlier.color = 'black')+
+  geom_boxplot(fill = "#9b5e4f",color = "brown", outlier.color = '#2980b9')+
   labs(title = "Tamaño del Motor", y = "", x = "Cilindrada") + theme_bw()
 
 p2 <- df %>%
     ggplot(aes(y= "", x=horsepower))+
-  geom_boxplot(fill = "#e67e22",color = "darkred", outlier.color = 'black')+
+  geom_boxplot(fill = "#9b5e4f",color = "brown", outlier.color = '#2980b9')+
   labs(title = "Caballos de Fuerza", y = "", x = "HP") + theme_bw()
 
 p3 <- df %>%
     ggplot(aes(y= "", x=`city-mpg`))+
-  geom_boxplot(fill = "#e67e22",color = "darkred", outlier.color = 'black')+
+  geom_boxplot(fill = "#9b5e4f",color = "brown", outlier.color = '#2980b9')+
   labs(title = "Rendimiento en Ciudad", y = "", x = "Millas por Galón") + theme_bw()
 
 p4 <- df %>%
     ggplot(aes(y= "", x=`curb-weight`))+
-  geom_boxplot(fill = "#e67e22",color = "darkred", outlier.color = 'black')+
+  geom_boxplot(fill = "#9b5e4f",color = "brown", outlier.color = '#2980b9')+
   labs(title = "Peso del Vehículo", y = "", x = "Libras") + theme_bw()
 
 p1 + p2 + p3 + p4
@@ -228,7 +227,7 @@ INTERPRETACION DE ESA TABLA ^^^^^^^^^
 # Relación entre estilo de carrocería y precio
 df %>%
   ggplot(aes(x = `body-style`, y = price)) +
-  geom_boxplot(fill = "#9b5e4f", color = "black", outlier.color = 'red', alpha = 0.8) +
+  geom_boxplot(fill = "#9b5e4f", color = "brown", outlier.color = '#2980b9', alpha = 0.8) +
   labs(title = "Distribución del Precio según la Carrocería", x = "Estilo", y = "Precio (USD)") +
   theme_bw()
 ```
