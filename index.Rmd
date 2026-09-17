@@ -11,3 +11,18 @@ link-citations: yes
 github-repo: rstudio/bookdown-demo
 description: ""
 ---
+
+# Proyecto final metodos estadistico {-}
+Para este trabajo vamos a utilizar el conocido conjunto de datos Automobile (obtenido del 1985 Ward's Automotive Yearbook de la UCI). Este dataset incluye información muy variada sobre diferentes modelos de autos de esa época.
+
+En total, la base de datos cuenta con 205 observaciones (autos) y 25 variables que mezclan datos numéricos y categóricos. La información se divide principalmente en tres aspectos:
+
+**Características técnicas y físicas:** Detalles del vehículo como las dimensiones, el tipo de motor, los caballos de fuerza (horsepower) y el rendimiento de combustible.
+
+**Nivel de riesgo (Symboling):** Una puntuación asignada por aseguradoras que va desde +3 (autos considerados más riesgosos o deportivos) hasta -3 (autos muy seguros).
+
+**Pérdidas normalizadas:** Un indicador que mide el pago promedio de siniestros por año, ajustado según el tamaño y tipo de auto.
+
+**Objetivo del Trabajo**
+El propósito principal de este análisis será limpiar y preparar los datos para construir un modelo predictivo donde nuestra variable objetivo (o variable dependiente) será el precio `price`. La idea es descubrir qué características técnicas y comerciales influyen más en el valor de mercado de los automóviles.
+
