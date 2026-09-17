@@ -1,4 +1,19 @@
-# EDA {#intro}
+# Introducción {#intro}
+Para este trabajo vamos a utilizar el conocido conjunto de datos Automobile (obtenido del 1985 Ward's Automotive Yearbook de la UCI). Este dataset incluye información muy variada sobre diferentes modelos de autos de esa época.
+
+En total, la base de datos cuenta con 205 observaciones (autos) y 25 variables que mezclan datos numéricos y categóricos. La información se divide principalmente en tres aspectos:
+
+**Características técnicas y físicas:** Detalles del vehículo como las dimensiones, el tipo de motor, los caballos de fuerza (horsepower) y el rendimiento de combustible.
+
+**Nivel de riesgo (Symboling):** Una puntuación asignada por aseguradoras que va desde +3 (autos considerados más riesgosos o deportivos) hasta -3 (autos muy seguros).
+
+**Pérdidas normalizadas:** Un indicador que mide el pago promedio de siniestros por año, ajustado según el tamaño y tipo de auto.
+
+**Objetivo del Trabajo**
+El propósito principal de este análisis será limpiar y preparar los datos para construir un modelo predictivo donde nuestra variable objetivo (o variable dependiente) será el precio `price`. La idea es descubrir qué características técnicas y comerciales influyen más en el valor de mercado de los automóviles.
+
+## Analisis Exploratorio de los datos
+Librerias ultilizadas:
 ```{r libreria, message=FALSE, warning=FALSE}
 library(tidyverse)
 library(dtplyr)
@@ -10,7 +25,10 @@ library(readr)
 library(dplyr)
 library(moments) 
 library(ggplot2)
+library(knitr)
+library(kableExtra)
 ```
+
 
 ```{r}
 
@@ -30,9 +48,10 @@ colnames(Automobile) <- c(
 ```
 
 
-Muestrame las 5 primeras filas
+Veamos las primeras 5 filas
 ```{r filas}
-head(Automobile, n=5)
+kable(head(Automobile, n=5), caption="Primeras 5 observaciones de la base de datos Automobile") %>% 
+  scroll_box(width="100%", height = "300px")
 ```
 
 La estructura de los datos
@@ -46,22 +65,35 @@ colSums
 Automobile[Automobile == "?"] <- NA
 
 Automobile %>%
-  summarise(across(everything(), ~ sum(is.na(.)),.names = "NA_{.col}"))
+  summarise(across(everything(), ~ sum(is.na(.)),.names = "NA_{.col}")) %>% 
+  kable(caption = "Conteo de valores faltantes") %>% 
+  scroll_box(width="100%", height = "300px")
 ```
+Observamos que un total de 5 variables(`normalized-losses`, `num-of-doors`, `bore`, `stroke` y `price`) presentan valores faltantes. Debido a que la variable `normalized-losses` presenta una cantidad considerable de valores faltantes (42), si optamos por eliminar esas filas, se afectaría negativamente la potencia estadística.
 
-Ahora, hagamos imputación de datos faltantes
+Por lo anterior, hagamos imputación de datos faltantes
 ```{r imp}
+moda <- function(x) {
+  ux <- unique(na.omit(x))
+  ux[which.max(tabulate(match(x, ux)))]
+}
+
 Automobile %>%
-  mutate(across(where(is.character), ~ na_if(., "?"))) %>%
+  mutate(across(where(is.character), ~ na_if(na_if(., "?"), ""))) %>%
   type.convert(as.is = TRUE) %>%
+  mutate(across(where(~ is.character(.) | is.factor(.)), ~ ifelse(is.na(.), moda(.), no = as.character(.)))) %>% 
   mutate(across(where(is.numeric), ~ ifelse(is.na(.), mean(., na.rm = TRUE), .))) -> df
 ```
 
 Verifiquemos si tiene datos faltantes
 ```{r faltantes2}
 df %>%
-  summarise(across(everything(), ~ sum(is.na(.)), .names = "NA_{.col}"))
+  summarise(across(everything(), ~ sum(is.na(.)), .names = "NA_{.col}")) %>% 
+  kable(caption = "Conteo de valores faltantes") %>% 
+  scroll_box(width="100%", height = "300px")
 ```
+Ahora si nuestra muestra ya no presenta valores faltantes
+
 
 Vamos a convertir la variable 'fuel-type' en un factor
 ```{r factofuel}
@@ -82,25 +114,37 @@ df %>% summarise(n = length(price),
                  minimo = min(price, na.rm = TRUE),
                  maximo = max(price, na.rm = TRUE),
                  asimetria = skewness(price, na.rm = TRUE),
-                 curtosis = kurtosis(price, na.rm = TRUE))
+                 curtosis = kurtosis(price, na.rm = TRUE)) %>% 
+    kable(caption = "Resumen estadistico de la variable") %>% 
+    scroll_box(width="100%", height = "300px")
 ```
--------------------------------------
-INTERPRETACION DE ESA TABLA ^^^^^^^^^
--------------------------------------
+El análisis de la variable `price` a partir de 205 automoviles revela que el precio promedio de los autos se sitúa en torno a los \$13207.13 USD (SD=7868.7). La distribución muestra que la mitad de los autos registran valores inferiores o iguales a \$10595 USD, mientras que el 50% central se concentra en un rango intercuantílico de \$8712 USD(delimitado entre los \$7788 y \$16500).
 
+Los precios oscilan entre un mínimo de \$5118 USD y un máximo de \$ 45400 USD, reflejando una marcada dispersión. Adicionalmente, el coeficiente de asimetría obtenido es de 1.8, lo que indica una asimetría positiva fuerte. Esto revela que la gran mayoría de los automóviles de la muestra se concentran en rengos de precios accesibles, mientras que existe un grupo minoritario de vehículos de alta gama cuyos precios elevados estiran la distribución hacia la derecha.
+
+
+Veamos un Boxplot
 ```{r histprice}
 df %>%
+<<<<<<< HEAD
   ggplot(aes(x = `fuel-type`, y = price)) +
   geom_boxplot(fill = "#9b5e4f", alpha = 0.7) +
   labs(title = 'Distribución del precio según el tipo de combustible',
        x = 'Tipo de Combustible',
        y = 'Precio del auto (USD)') +
+=======
+  ggplot(aes(y= "", x=price))+
+  geom_boxplot(fill = "#9b5e4f",color = "#9b324f",
+               outlier.color = '#e74c3c')+
+  stat_summary(fun= mean, geom='point', shape=20,
+               size=4, color='navy') +
+  labs(title = "Dispersión y valores atípicos del precio", x = "Precio", y = "") +
+>>>>>>> 442d860 (Commit trabajo terminado)
   theme_bw()
 ```
--------------------------------------
-INTERPRETACION DE ESA TABLA ^^^^^^^^^
--------------------------------------
 
+
+Ahora un histograma
 ```{r}
 df %>%
   ggplot(aes(x = price)) +
@@ -115,10 +159,8 @@ df %>%
        y ='Densidad')+
   theme_bw()
 ```
--------------------------------------
-INTERPRETACION DE ESA TABLA ^^^^^^^^^
--------------------------------------
 
+<<<<<<< HEAD
 ```{r}
 df %>%
   ggplot(aes(y= "", x=price))+
@@ -132,9 +174,13 @@ df %>%
 -------------------------------------
 INTERPRETACION DE ESA TABLA ^^^^^^^^^
 -------------------------------------
+=======
+
+El análisis de `price` muestra una distribución con sesgo positivo, donde predominan los autos con precios económicos y medios frente a un grupo reducido de vehículos alta gama. A través de la visualización gráfica se identifican valores atípicos superiores que superan los **\$30000 USD**. Esta condición genera una diferencia notable entre la media y la mediana que afectará el comportamiento de los algoritmos predictivoss, haciendo necesario gestionar este detalle durante las siguientes etapas del análisis. 
+>>>>>>> 442d860 (Commit trabajo terminado)
 
 ## Análisis de las variables numéricas independientes
-
+Analizaremos inicialmente las variables numéricas
 ```{r var_indep_num}
 
 df %>%
@@ -151,14 +197,15 @@ df %>%
                  mediana = median(valor, na.rm = TRUE),
                  RIC = IQR(valor, na.rm = TRUE),
                  minimo = min(valor, na.rm = TRUE),
-                 maximo = max(valor, na.rm = TRUE))
+                 maximo = max(valor, na.rm = TRUE))%>% 
+    kable(caption = "Resumen estadistico de la variables numéricas independientes") %>% 
+    scroll_box(width="100%", height = "300px")
 ```
--------------------------------------
-INTERPRETACION DE ESA TABLA ^^^^^^^^^
--------------------------------------
+
+
 
 ```{r}
-# Usamos patchwork para unir los gráficos
+
 p1 <- df %>%
     ggplot(aes(y= "", x=`engine-size`))+
   geom_boxplot(fill = "#9b5e4f",color = "brown", outlier.color = '#2980b9')+
@@ -181,9 +228,16 @@ p4 <- df %>%
 
 p1 + p2 + p3 + p4
 ```
--------------------------------------
-INTERPRETACION DE ESA TABLA ^^^^^^^^^
--------------------------------------
+
+El análisis exploratorio de las principales características mecánicas y de rendimiento de los 205 automóviles muestra los siguientes comportamientos:
+
+**Rendimiento en ciudad `city-mpg`:** Los vehículos presentan un promedio de 25.22 MPG (desviación estándar de 6.54) y una mediana de 24 MPG, con un rango intercuartílico (RIC) de 11. Los valores oscilan entre un mínimo de 13 MPG y un máximo de 49 MPG, reflejando una variabilidad moderada en la eficiencia del combustible, donde la mayoría de los autos se concentran en consumos eficientes o moderados.
+
+**Peso del vehículo `(curb-weight)`:** El peso promedio se sitúa en 2555.57 lbs (SD = 520.68), con una mediana de 2414 lbs y un RIC de 790. La dispersión abarca desde un mínimo de 1488 lbs hasta un máximo de 4066 lbs, lo que evidencia la coexistencia de automóviles ligeros y vehículos de gran carrocería en la muestra.
+
+**Tamaño del motor `(engine-size)`:** Esta variable registra una media de 126.91 pulgadas cúbicas (SD = 41.64) y una mediana de 120, con un RIC de 44. Los valores van desde un mínimo de 61 hasta un máximo de 326, indicando una asimetría positiva impulsada por una minoría de motores de alta cilindrada.
+
+**Caballos de fuerza `(horsepower)`:** La potencia media de los motores es de 104.26 HP (SD = 39.52), con una mediana de 95 HP y un RIC de 46. El rango va desde los 48 HP hasta los 288 HP, mostrando una concentración de vehículos con potencias estándar y un grupo selecto de autos deportivos o de alto rendimiento que extienden la cola de la distribución hacia valores superiores.
 
 ## Análisis de variable categórica: body-style
 
@@ -202,9 +256,8 @@ tabla_body %>%
   scale_y_continuous(expand = expansion(mult=c(0,0.15)))+
   theme_bw()
 ```
--------------------------------------
-INTERPRETACION DE ESA TABLA ^^^^^^^^^
--------------------------------------
+
+La variable `body-style` presenta una distribución desigual entre sus categorías. La categoría `sedan` concentra el 46.8% de los registros, seguida de `hatchback` con el 34.1%, por lo que en conjunto ambas representan el 80.9% de las observaciones. Las categorías `wagon`, `hardtop` y `convertible` corresponden al 12.2%, 3.9% y 2.9%, respectivamente, evidenciando una baja frecuencia en los diseños minoritarios. Esta distribución evidencia un desbalance entre las categorías, especialmente en el caso de los estilos con menor representación, cuya baja frecuencia puede dificultar la estimación confiable en los modelos estadísticos. En consecuencia, durante el proceso de modelamiento será necesario considerar este desbalance, ya sea mediante técnicas de codificación adecuadas, agrupación de categorías poco representadas o evaluando el impacto de estas en el desempeño de los modelos.
 
 ## Análisis Exploratorio Bivariado
 
@@ -219,9 +272,12 @@ df %>%
        y='Precio (USD)') +
   theme_bw()
 ```
--------------------------------------
-INTERPRETACION DE ESA TABLA ^^^^^^^^^
--------------------------------------
+
+Los puntos presentan una tendencia ascendente claramente definida, indicando que, a medida que aumenta el tamaño del motor de un automóvil, también tiende a incrementarse su precio en USD. La mayor concentración de observaciones se encuentra en tamaños de motor entre 80 y 150 y valores de precio inferiores a $20,000 USD, aunque existe una dispersión considerable para un mismo nivel de cilindrada.
+
+Se observa que la variabilidad del precio de los vehículos aumenta conforme crece el tamaño del motor, lo que sugiere que en los automóviles con motores más grandes y potentes existen rangos de precios más amplios y diversos (típicamente asociados a vehículos de gama alta o deportivos).
+
+En general, la relación entre el tamaño del motor y el precio es positiva y aproximadamente lineal, siendo una de las asociaciones más fuertes del conjunto de datos. Esto sugiere que el tamaño del motor constituye una variable con un alto poder explicativo para predecir el valor de los automóviles y, por tanto, será un predictor fundamental en la construcción de los modelos de regresión.
 
 ```{r}
 # Relación entre estilo de carrocería y precio
@@ -231,9 +287,14 @@ df %>%
   labs(title = "Distribución del Precio según la Carrocería", x = "Estilo", y = "Precio (USD)") +
   theme_bw()
 ```
--------------------------------------
-INTERPRETACION DE ESA TABLA ^^^^^^^^^
--------------------------------------
+
+**Categorías de mayor valor (Convertible y Hardtop):** Los estilos convertible y hardtop registran las medianas de precios más elevadas (situadas aproximadamente entre los \$17,000 y \$20,000 USD) y cajas más amplias, lo que indica una mayor variabilidad y precios considerablemente más altos en el 50% central de la distribución, reflejando su naturaleza de vehículos orientados a nichos exclusivos o de gama alta.
+
+**Segmento económico (Hatchback):** En contraste, los modelos hatchback presentan la distribución con los precios más bajos de la muestra, con una mediana cercana a los \$9,000 USD y un rango intercuartílico más compacto, lo que denota mayor homogeneidad en este tipo de vehículos utilitarios o económicos.
+
+**Segmentos intermedios y valores atípicos (Sedán y Wagon):** Los estilos sedán y wagon muestran medianas similares ubicadas alrededor de los \$12,000 USD. No obstante, el segmento de los sedanes destaca por la presencia de múltiples valores atípicos (outliers) en el extremo superior que superan los \$40,000 USD, lo que evidencia la existencia de berlinas o sedanes de lujo dentro de una categoría que mayoritariamente concentra autos de precios moderados.
+
+Estos resultados demuestran que el estilo de carrocería ejerce una influencia notable sobre la valuación de los automóviles, aportando información discriminatoria clave que será de gran utilidad como variable predictiva en los modelos de regresión.
 
 ## Feature Engineering (Nuevas Variables)
 
@@ -250,14 +311,11 @@ df$weight_power_ratio <- df$`curb-weight` / df$horsepower
 # Verificamos la correlación con el precio
 cor(df[, c("price", "avg_mpg", "weight_power_ratio")], use = "complete.obs")
 ```
--------------------------------------
-INTERPRETACION DE ESA TABLA ^^^^^^^^^
--------------------------------------
 
+La matriz de correlación muestra las asociaciones lineales entre el precio de los automóviles (`price`), el rendimiento promedio de combustible (`avg_mpg`) y la relación peso-potencia (`weight_power_rati`). Se observa una correlación negativa moderada-alta entre el precio y el rendimiento de combustible (-0.684), lo que indica que los vehículos más costosos tienden a consumir más combustible (menor eficiencia en MPG), mientras que la relación entre el precio y la relación peso-potencia presenta una asociación negativa más débil (-0.415). Por su parte, `avg_mpg` y `weight_power_ratio` muestran una correlación positiva moderada (0.612), evidenciando que estas variables guardan consistencia lógica dentro de las características técnicas de los vehículos de cara a la construcción de los modelos predictivos.
 ```{r}
 # Verificamos las relaciones visualmente con GGally
 ggpairs(df[, c("price", "horsepower", "avg_mpg", "weight_power_ratio")])
 ```
--------------------------------------
-INTERPRETACION DE ESA TABLA ^^^^^^^^^
--------------------------------------
+
+En la relación con la variable objetivo (`price`), destaca una fuerte correlación positiva con los caballos de fuerza (`horsepower` con un coeficiente de $0.758$), indicando que los vehículos con mayor potencia tienden a registrar precios considerablemente más elevados. Por su parte, el rendimiento de combustible (`avg_mpg`) presenta una asociación inversa fuerte con el precio ($-0.684$) y con la potencia ($-0.792$), lo que confirma que los autos más rápidos y costosos son también los menos eficientes en consumo de combustible, aportando variables predictivas altamente significativas para los futuros modelos de regresión.
