@@ -30,3 +30,7 @@ interpretacion-de-esa-tabla-6
 feature-engineering-nuevas-variables
 section-7
 interpretacion-de-esa-tabla-7
+tab:filas
+tab:faltantes
+tab:faltantes2
+analisis-exploratorio-de-los-datos
