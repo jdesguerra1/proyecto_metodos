@@ -1,6 +1,5 @@
 # Desarrollo {#intro}
 
-## Analisis Exploratorio de los datos
 Librerias ultilizadas:
 ```{r libreria, message=FALSE, warning=FALSE}
 library(tidyverse)
@@ -15,8 +14,56 @@ library(moments)
 library(ggplot2)
 library(knitr)
 library(kableExtra)
+library(car)       
+library(lmtest)    
+library(sandwich) 
 ```
 
+
+## Contexto de los datos
+
+La base **Automobile** (UCI Machine Learning Repository) reúne especificaciones técnicas, un indicador de riesgo de seguro y el precio de 205 automóviles de modelos importados de 1985. <!-- REVISAR: confirmar la fuente exacta en la página de UCI -->
+
+**Objetivo.** Describir cómo se comportan las características de los automóviles y construir un modelo que explique y prediga el precio (`price`) a partir de ellas. Para esto aplicamos análisis exploratorio, correlación, pruebas de hipótesis paramétricas y no paramétricas, tablas de contingencia, regresión lineal simple y regresión lineal múltiple.
+
+```{r ctx_dicc, echo=FALSE}
+diccionario <- tibble::tribble(
+  ~Variable, ~Tipo, ~Descripción,
+  "symboling", "Ordinal", "Calificación de riesgo asignada por la aseguradora (-3 a 3; mayor = más riesgoso)",
+  "normalized-losses", "Numérica", "Pérdida relativa promedio por pagos de seguro, normalizada por tamaño de vehículo",
+  "make", "Categórica", "Marca",
+  "fuel-type", "Categórica", "Tipo de combustible (diésel o gas)",
+  "aspiration", "Categórica", "Tipo de aspiración (estándar o turbo)",
+  "num-of-doors", "Categórica", "Número de puertas (dos o cuatro)",
+  "body-style", "Categórica", "Estilo de carrocería",
+  "drive-wheels", "Categórica", "Tracción (4wd, fwd, rwd)",
+  "engine-location", "Categórica", "Ubicación del motor (delantero o trasero)",
+  "wheel-base", "Numérica", "Distancia entre ejes (pulgadas)",
+  "length", "Numérica", "Largo (pulgadas)",
+  "width", "Numérica", "Ancho (pulgadas)",
+  "height", "Numérica", "Alto (pulgadas)",
+  "curb-weight", "Numérica", "Peso en vacío (libras)",
+  "engine-type", "Categórica", "Tipo de motor",
+  "num-of-cylinders", "Categórica", "Número de cilindros",
+  "engine-size", "Numérica", "Tamaño del motor (pulgadas cúbicas)",
+  "fuel-system", "Categórica", "Sistema de combustible",
+  "bore", "Numérica", "Diámetro del cilindro (pulgadas)",
+  "stroke", "Numérica", "Carrera del pistón (pulgadas)",
+  "compression-ratio", "Numérica", "Relación de compresión",
+  "horsepower", "Numérica", "Caballos de fuerza",
+  "peak-rpm", "Numérica", "Revoluciones por minuto en la máxima potencia",
+  "city-mpg", "Numérica", "Rendimiento en ciudad (millas por galón)",
+  "highway-mpg", "Numérica", "Rendimiento en carretera (millas por galón)",
+  "price", "Numérica", "Precio del automóvil (variable respuesta)"
+)
+
+kable(diccionario, caption = "Diccionario de variables de la base Automobile") %>%
+  scroll_box(width = "100%", height = "400px")
+```
+
+### Extracción, transformación y carga (ETL)
+
+En las siguientes secciones leemos el archivo, asignamos nombres a las columnas, convertimos el símbolo `?` en dato faltante, imputamos los faltantes y definimos `fuel-type` como factor.
 
 ```{r}
 
@@ -35,7 +82,7 @@ colnames(Automobile) <- c(
  
 ```
 
-
+## Analisis Exploratorio de los datos
 Veamos las primeras 5 filas
 ```{r filas}
 kable(head(Automobile, n=5), caption="Primeras 5 observaciones de la base de datos Automobile") %>% 
@@ -49,8 +96,8 @@ str(Automobile)
 
 Veamos si hay datos faltantes
 ```{r faltantes}
-colSums
 Automobile[Automobile == "?"] <- NA
+Automobile <- Automobile %>% filter(!is.na(price))
 
 Automobile %>%
   summarise(across(everything(), ~ sum(is.na(.)),.names = "NA_{.col}")) %>% 
@@ -58,7 +105,7 @@ Automobile %>%
   scroll_box(width="100%", height = "300px")
 ```
 
-Observamos que un total de 5 variables(`normalized-losses`, `num-of-doors`, `bore`, `stroke` y `price`) presentan valores faltantes. Debido a que la variable `normalized-losses` presenta una cantidad considerable de valores faltantes (42), si optamos por eliminar esas filas, se afectaría negativamente la potencia estadística.
+Observamos que un total de 5 variables(`normalized-losses`, `num-of-doors`, `bore`, `stroke`, `horsepower`, `peak-rpm` y `price`) presentan valores faltantes. Debido a que la variable `normalized-losses` presenta una cantidad considerable de valores faltantes (41), si optamos por eliminar esas filas, se afectaría negativamente la potencia estadística.
 
 Por lo anterior, hagamos imputación de datos faltantes
 ```{r imp}
@@ -281,3 +328,773 @@ ggpairs(df[, c("price", "horsepower", "avg_mpg", "weight_power_ratio")])
 ```
 
 En la relación con la variable objetivo (`price`), destaca una fuerte correlación positiva con los caballos de fuerza (`horsepower` con un coeficiente de $0.758$), indicando que los vehículos con mayor potencia tienden a registrar precios considerablemente más elevados. Por su parte, el rendimiento de combustible (`avg_mpg`) presenta una asociación inversa fuerte con el precio ($-0.684$) y con la potencia ($-0.792$), lo que confirma que los autos más rápidos y costosos son también los menos eficientes en consumo de combustible, aportando variables predictivas altamente significativas para los futuros modelos de regresión.
+
+## Análisis de correlación
+
+Para medir la fuerza de la relación entre `price` y las variables numéricas usamos tres coeficientes: **Pearson** (relación lineal; sensible a outliers y a la asimetría), **Spearman** y **Kendall** (basados en rangos, más robustos). Como `price` tiene una asimetría positiva fuerte, es importante comparar los tres.
+
+```{r cor_heat, fig.width=9, fig.height=7}
+num_vars <- df %>% dplyr::select(where(is.numeric))
+cor_mat  <- cor(num_vars, method = "pearson")
+
+cor_long <- as.data.frame(as.table(cor_mat)) %>%
+  rename(V1 = Var1, V2 = Var2, r = Freq)
+
+ggplot(cor_long, aes(x = V1, y = V2, fill = r)) +
+  geom_tile(color = "white") +
+  geom_text(aes(label = round(r, 2)), size = 2.4) +
+  scale_fill_gradient2(low = "#2980b9", mid = "white", high = "#c0392b",
+                       limits = c(-1, 1), name = "r") +
+  labs(title = "Matriz de correlación de Pearson (variables numéricas)",
+       x = "", y = "") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+Ahora aplicamos las pruebas de hipótesis $H_0:\rho=0$ frente a $H_1:\rho\neq 0$ entre `price` y las principales variables numéricas:
+
+```{r cor_tests}
+vars_cor <- c("engine-size", "horsepower", "curb-weight", "wheel-base",
+              "length", "width", "city-mpg", "highway-mpg")
+
+tabla_cor <- purrr::map_dfr(vars_cor, function(v) {
+  x <- df[[v]]
+  y <- df$price
+  p_ <- cor.test(x, y, method = "pearson")
+  s_ <- suppressWarnings(cor.test(x, y, method = "spearman", exact = FALSE))
+  k_ <- suppressWarnings(cor.test(x, y, method = "kendall",  exact = FALSE))
+  tibble(Variable    = v,
+         Pearson     = unname(p_$estimate), `p Pearson`  = format.pval(p_$p.value, digits = 3, eps = 1e-4),
+         Spearman    = unname(s_$estimate), `p Spearman` = format.pval(s_$p.value, digits = 3, eps = 1e-4),
+         Kendall     = unname(k_$estimate), `p Kendall`  = format.pval(k_$p.value, digits = 3, eps = 1e-4))
+})
+
+kable(tabla_cor, digits = 3, caption = "Correlación de `price` con las variables numéricas") %>%
+  scroll_box(width = "100%", height = "320px")
+```
+
+```{r cor_texto, include=FALSE}
+mejor <- tabla_cor$Variable[which.max(abs(tabla_cor$Pearson))]
+r_mejor_p <- tabla_cor$Pearson[tabla_cor$Variable == mejor]
+r_mejor_s <- tabla_cor$Spearman[tabla_cor$Variable == mejor]
+```
+
+La variable con mayor asociación lineal con el precio es `engine-size` ($Pearson = 0.872$; $Spearman = 0.828$). En todas las pruebas se rechaza $H_0$ cuando el p-valor es menor que 0.05 (ver tabla), es decir, hay evidencia de correlación distinta de cero.
+
+Las variables con relacion positiva son: `engine-size`, `horsepower`, `curb-weight`, `length`, `wheel-base` y `width`.
+Las variables con relación negativa son: `city-mpg` y	`highway-mpg`. Además, todas las variables menos `engine-size`, presentan una relacion monótona no lineal ya que Spearman es mayor qque Pearson en valor absoluto.	
+
+Interpretación de la magnitud (valor absoluto): menor que 0.3 débil, entre 0.3 y 0.7 moderada, mayor que 0.7 fuerte. Recordemos que correlación no implica causalidad: indica asociación, no que una variable cause a la otra.
+
+## Pruebas de hipótesis
+
+```{r ht_prep}
+dft <- df %>%
+  mutate(log_price  = log(price),
+         body_style = factor(`body-style`),
+         fuel_type  = factor(`fuel-type`))
+```
+
+### Dos grupos independientes: precio según tipo de combustible
+
+Queremos saber si el precio de los autos diésel difiere del de los autos a gasolina. Como `price` es muy asimétrico, aplicamos el test t sobre $\log(\text{price})$ y, como alternativa no paramétrica, la prueba de Wilcoxon-Mann-Whitney sobre `price`.
+
+**Condiciones del test t:** independencia entre grupos, normalidad dentro de cada grupo y homogeneidad de varianzas.
+
+```{r ht_desc_fuel}
+dft %>%
+  group_by(fuel_type) %>%
+  summarise(n = n(),
+            media_log = mean(log_price),
+            sd_log    = sd(log_price),
+            mediana_price = median(price),
+            p_shapiro_log   = shapiro.test(log_price)$p.value,
+            p_shapiro_price = shapiro.test(price)$p.value) %>%
+  kable(digits = 4, caption = "Resumen por tipo de combustible y pruebas de normalidad") %>%
+  scroll_box(width = "100%", height = "200px")
+
+ggplot(dft, aes(x = fuel_type, y = log_price)) +
+  geom_boxplot(fill = "#9b5e4f", color = "brown", outlier.color = "#2980b9", alpha = 0.8) +
+  labs(title = "log(precio) según tipo de combustible", x = "Combustible", y = "log(precio)") +
+  theme_bw()
+```
+
+```{r ht_var_fuel}
+leveneTest(log_price ~ fuel_type, data = dft)
+var.test(log_price ~ fuel_type, data = dft)
+```
+
+Como las varianzas pueden ser distintas y los tamaños de grupo son muy desiguales, usamos la versión de Welch (sin suponer varianzas iguales):
+
+```{r ht_t_fuel}
+t_fuel <- t.test(log_price ~ fuel_type, data = dft, var.equal = FALSE)
+t_fuel
+
+# diferencia de medias en log (primer grupo menos segundo) y su efecto porcentual
+dif_log <- unname(t_fuel$estimate[1] - t_fuel$estimate[2])
+pct     <- (exp(dif_log) - 1) * 100
+
+# tamaño del efecto: d de Cohen
+cohen_d <- function(x, g) {
+  g  <- factor(g)
+  x1 <- x[g == levels(g)[1]]
+  x2 <- x[g == levels(g)[2]]
+  sp <- sqrt(((length(x1) - 1) * var(x1) + (length(x2) - 1) * var(x2)) /
+               (length(x1) + length(x2) - 2))
+  (mean(x1) - mean(x2)) / sp
+}
+d_fuel <- cohen_d(dft$log_price, dft$fuel_type)
+d_fuel
+```
+
+```{r ht_w_fuel}
+w_fuel <- wilcox.test(price ~ fuel_type, data = dft, exact = FALSE, conf.int = TRUE)
+w_fuel
+
+# correlación biserial por rangos como tamaño del efecto
+n_g   <- table(dft$fuel_type)
+rb    <- unname(2 * w_fuel$statistic / (n_g[1] * n_g[2]) - 1)
+rb
+```
+
+Las hipótesis son $H_0:\mu_{\text{diésel}}=\mu_{\text{gas}}$ frente a $H_1:\mu_{\text{diésel}}\neq\mu_{\text{gas}}$ (en la escala logarítmica). El test t de Welch da $t=1.99$ con $p = 0.057$, por lo que no rechazamos $H_0$: no hay evidencia suficiente de diferencia"). En términos prácticos, los autos diésel cuestan aproximadamente 25.9% más que los de gasolina (razón de medias geométricas). El tamaño del efecto es $d=0.46$(pequeño).
+
+La prueba de Wilcoxon-Mann-Whitney, que no exige normalidad, da $p = 0.041$ y una correlación biserial por rangos de $0.28$, de modo que llega a la misma conclusión. 
+
+### Dos grupos pareados: rendimiento en carretera vs. en ciudad
+
+Cada automóvil tiene dos mediciones, `highway-mpg` y `city-mpg`, por lo que las muestras son **dependientes**. Trabajamos con la diferencia $d_i=\text{highway}_i-\text{city}_i$ y probamos $H_0:\mu_d=0$ frente a $H_1:\mu_d\neq 0$.
+
+```{r ht_pareado}
+dif_mpg <- df$`highway-mpg` - df$`city-mpg`
+
+ggplot(tibble(dif = dif_mpg), aes(x = dif)) +
+  geom_histogram(binwidth = 1, fill = "#9b5e4f", color = "white", alpha = 0.8) +
+  labs(title = "Diferencia highway-mpg − city-mpg", x = "Diferencia (mpg)", y = "Frecuencia") +
+  theme_bw()
+
+sw_dif <- shapiro.test(dif_mpg)
+sw_dif
+
+t_par <- t.test(df$`highway-mpg`, df$`city-mpg`, paired = TRUE)
+t_par
+
+w_par <- wilcox.test(df$`highway-mpg`, df$`city-mpg`, paired = TRUE,
+                     exact = FALSE, conf.int = TRUE)
+w_par
+
+dz <- mean(dif_mpg) / sd(dif_mpg)   # tamaño del efecto (d de Cohen pareado)
+```
+
+En promedio, los autos rinden 5.51 mpg más en carretera que en ciudad ($IC 95%: 5.28$ a $5.73$). El test t pareado da $p = 2.1e-112$, por lo que rechazamos $H_0$ con un tamaño del efecto $d_z=3.41$. Como la prueba de Shapiro-Wilk sobre las diferencias tiene $p =  1.84e-09$, no podemos asumir normalidad y damos más peso a la prueba de Wilcoxon de rangos con signo ($p = 0$).
+
+### Más de dos grupos: precio según el estilo de carrocería
+
+Comparamos el precio entre los cinco estilos de `body-style`. Los grupos tienen tamaños muy desiguales (hay pocos convertibles y hardtop) y el precio es asimétrico, así que usamos dos enfoques: **ANOVA** sobre $\log(\text{price})$ y **Kruskal-Wallis** sobre `price`.
+
+$H_0:\mu_1=\cdots=\mu_5$ frente a $H_1:$ al menos una media distinta.
+
+```{r ht_anova}
+modelo_aov <- aov(log_price ~ body_style, data = dft)
+res_aov    <- summary(modelo_aov)
+res_aov
+
+# supuestos: normalidad de residuales y homogeneidad de varianzas
+sw_aov  <- shapiro.test(residuals(modelo_aov))
+lev_aov <- leveneTest(log_price ~ body_style, data = dft)
+sw_aov
+lev_aov
+
+# tamaño del efecto: eta cuadrado
+ss   <- res_aov[[1]][["Sum Sq"]]
+eta2 <- ss[1] / sum(ss)
+F_aov <- res_aov[[1]][["F value"]][1]
+p_aov <- res_aov[[1]][["Pr(>F)"]][1]
+```
+
+El ANOVA da $F=8.46$ con $p = 2.57e-06$, por lo que rechazamos $H_0$: el precio medio (en log) no es igual en todos los estilos. El estilo de carrocería explica el 14.7% de la variabilidad de $\log(\text{price})$ ($\eta^2=0.147$). Respecto a los supuestos, Shapiro-Wilk sobre los residuales da $p = 9.04e-06$ y Levene $p =  0.00406$. 
+
+**Comparaciones múltiples (Tukey).** Como se rechazó $H_0$, identificamos qué pares de estilos difieren:
+
+```{r ht_tukey}
+tuk <- as.data.frame(TukeyHSD(modelo_aov)$body_style)
+kable(tuk, digits = 4, caption = "Comparaciones múltiples de Tukey (log del precio)") %>%
+  scroll_box(width = "100%", height = "300px")
+pares_sig <- rownames(tuk)[tuk$`p adj` < 0.05]
+```
+
+Los pares con diferencia significativa al 5% son: `hatchback-convertible`, `hatchback-hardtop`, `sedan-hatchback`.
+
+**Alternativa no paramétrica (Kruskal-Wallis).** No exige normalidad y trabaja con rangos:
+
+```{r ht_kw}
+kw <- kruskal.test(price ~ body_style, data = dft)
+kw
+
+eps2 <- unname(kw$statistic) / (nrow(dft) - 1)   # épsilon cuadrado
+
+# post-hoc por pares con corrección de Holm
+pairwise.wilcox.test(dft$price, dft$body_style,
+                     p.adjust.method = "holm", exact = FALSE)
+```
+
+Kruskal-Wallis da $H=25.02$  ($p = 4.98e-05$) y $\epsilon^2=0.125$, así que también se rechaza que el precio sea igual en todos los estilos. En el post-hoc se usó la corrección de Holm para controlar el error por comparaciones múltiples.
+
+## Tabla de contingencia
+
+Queremos saber si el tipo de tracción (`drive-wheels`) y el estilo de carrocería están asociados. Una sola muestra de autos se clasifica con dos criterios, así que corresponde la **prueba de independencia** con $H_0$: las variables son independientes. Para evitar celdas casi vacías, agrupamos los estilos poco frecuentes en la categoría `otras`.
+
+```{r ct_tabla}
+dfc <- df %>%
+  mutate(traccion   = factor(`drive-wheels`),
+         carroceria = case_when(`body-style` == "sedan"     ~ "sedan",
+                                `body-style` == "hatchback" ~ "hatchback",
+                                TRUE                        ~ "otras"))
+
+tab <- table(Traccion = dfc$traccion, Carroceria = dfc$carroceria)
+tab
+round(prop.table(tab, margin = 1) * 100, 1)   # % por fila
+
+ggplot(dfc, aes(x = traccion, fill = carroceria)) +
+  geom_bar(position = "fill") +
+  scale_y_continuous(labels = scales::percent) +
+  labs(title = "Estilo de carrocería según tipo de tracción",
+       x = "Tracción", y = "Porcentaje", fill = "Carrocería") +
+  theme_bw()
+```
+
+```{r ct_chi}
+set.seed(123)
+chi <- chisq.test(tab)
+chi$expected                                  # frecuencias esperadas
+usa_sim <- any(chi$expected < 5)
+if (usa_sim) chi <- chisq.test(tab, simulate.p.value = TRUE, B = 10000)
+chi
+
+# V de Cramér
+V <- sqrt(unname(chi$statistic) / (sum(tab) * (min(dim(tab)) - 1)))
+V
+
+# residuales estandarizados (|valor| > 2 indica celdas que más contribuyen)
+round(chi$stdres, 2)
+```
+
+Como alguna frecuencia esperada es menor que 5 (por ejemplo, en la tracción 4wd), la aproximación chi-cuadrado no es confiable; por eso calculamos el p-valor por simulación de Monte Carlo. El estadístico es $\chi^2=15.63$ con $p = 0.0036$, de modo que rechazamos $H_0$: existe asociación entre la tracción y el estilo de carrocería. La V de Cramér es 0.197 (asociación débil).
+
+## Modelo de regresión lineal simple
+
+### Elección de la transformación
+
+Evaluamos tres especificaciones: `price` sin transformar, $\log(\text{price})$ y $\log(\text{price})$ frente a $\log(\text{engine-size})$.
+
+```{r rls_datos}
+rls <- df %>%
+  transmute(price,
+            log_price    = log(price),
+            engine_size  = `engine-size`,
+            log_engine   = log(`engine-size`))
+
+mod_raw    <- lm(price ~ engine_size, data = rls)
+mod_log    <- lm(log_price ~ engine_size, data = rls)
+mod_loglog <- lm(log_price ~ log_engine, data = rls)
+
+diag_mod <- function(m, nombre) {
+  tibble(Modelo = nombre,
+         `R2 ajustado`     = summary(m)$adj.r.squared,
+         `p Shapiro-Wilk`  = shapiro.test(residuals(m))$p.value,
+         `p Breusch-Pagan` = lmtest::bptest(m)$p.value)
+}
+
+bind_rows(diag_mod(mod_raw,    "price ~ engine-size"),
+          diag_mod(mod_log,    "log(price) ~ engine-size"),
+          diag_mod(mod_loglog, "log(price) ~ log(engine-size)")) %>%
+  kable(digits = 4, caption = "Comparación de especificaciones (el R2 no es comparable entre escalas distintas de la respuesta)")
+```
+```{r}
+AIC(mod_log, mod_loglog)
+```
+
+```{r rls_resid_comp, fig.width=11, fig.height=3.8}
+res_plot <- function(m, titulo) {
+  tibble(aj = fitted(m), res = resid(m)) %>%
+    ggplot(aes(x = aj, y = res)) +
+    geom_point(alpha = 0.6, color = "#2980b9") +
+    geom_hline(yintercept = 0, color = "#c0392b", linetype = 2) +
+    labs(title = titulo, x = "Valores ajustados", y = "Residuales") +
+    theme_bw()
+}
+
+res_plot(mod_raw, "price ~ engine-size") +
+  res_plot(mod_log, "log(price) ~ engine-size") +
+  res_plot(mod_loglog, "log(price) ~ log(engine-size)")
+```
+
+Con `price` sin transformar, los residuales se abren en forma de embudo (varianza creciente), lo que viola la homocedasticidad; las versiones con logaritmo corrigen total o parcialmente ese patrón. Para mantener la coherencia con el modelo múltiple, continuamos con $\log(\text{price})$ frente a `log_engine`.
+
+```{r rls_final}
+mod_rls <- mod_loglog
+summary(mod_rls)
+```
+
+### Estimación e inferencia sobre los coeficientes
+
+```{r rls_inferencia}
+confint(mod_rls)
+
+b1 <- coef(mod_rls)["log_engine"]
+c(por_1pct  = (1.01^b1 - 1) * 100,
+  por_10pct = (1.10^b1 - 1) * 100)
+```
+
+El coeficiente $\hat\beta_1=1.504$ es una elasticidad: si el tamaño del motor aumenta 1%, el precio cambia en promedio aproximadamente 1.5% (exactamente 1.51%), y si el motor aumenta 10%, el precio cambia en promedio 15.4%. El intervalo de confianza del 95% para $\beta_1$ es (1.371, 1.638), que no contiene el cero, de modo que la prueba $H_0:\beta_1=0$ se rechaza. El coeficiente de determinación es $R^2=0.712$.
+
+### Tabla ANOVA y significancia global
+
+```{r rls_anova}
+anova(mod_rls)
+
+F_rls <- summary(mod_rls)$fstatistic[1]
+t_rls <- summary(mod_rls)$coefficients["log_engine", "t value"]
+c(F = unname(F_rls), t_al_cuadrado = unname(t_rls^2))
+```
+
+En la regresión simple la prueba F global equivale a la prueba t de la pendiente ($F=t^2$), como se verifica arriba.
+
+### Análisis de residuales
+
+```{r rls_supuestos}
+res_rls <- residuals(mod_rls)
+
+set.seed(123)
+dw_rls <- durbinWatsonTest(mod_rls)
+sw_rls <- shapiro.test(res_rls)
+tt_rls <- t.test(res_rls, mu = 0)
+bp_rls <- bptest(mod_rls)
+
+dw_rls
+sw_rls
+tt_rls
+bp_rls
+
+par(mfrow = c(1, 2))
+plot(mod_rls, which = 1:2, las = 1, col = "darkseagreen")
+par(mfrow = c(1, 1))
+```
+
+- **Independencia:** $Durbin-Watson = 0.83$ ($p = 0$). Recordemos que las filas de la base no tienen un orden temporal real.
+- **Normalidad:** Shapiro-Wilk $p = 9.71e-06$.
+- **Media cero:** prueba t $p = 1$.
+- **Varianza constante:** Breusch-Pagan $p = 0.0898$.
+
+Concluimos que se cumplen los supuestos de Media cero y varianza constante. En cambio, no se cumple la normalidad de los residuos, ni la independencia bajo el orden actual de las filas.
+
+
+### Estimación de la respuesta media y predicción
+
+Para un motor de tamaño igual a la mediana de la muestra (120 pulgadas cúbicas) calculamos un intervalo de confianza para el precio típico y un intervalo de predicción para un auto nuevo, devueltos a dólares con la función exponencial.
+
+```{r rls_prediccion}
+x0 <- data.frame(log_engine = log(median(rls$engine_size)))
+
+ic0 <- exp(predict(mod_rls, newdata = x0, interval = "confidence"))
+ip0 <- exp(predict(mod_rls, newdata = x0, interval = "prediction"))
+ic0
+ip0
+```
+
+Para un motor de 120 pulgadas cúbicas, el precio típico estimado es de aproximadamente \$11282 USD; con 95% de confianza, el precio típico está entre \$10865 y \$11714 USD, y el precio de un auto nuevo estaría entre \$6615 y \$19239 USD. El intervalo de predicción es más amplio porque incluye la variabilidad individual del error.
+
+```{r rls_banda, fig.height=4.5}
+grid <- tibble(engine_size = seq(min(rls$engine_size), max(rls$engine_size), length.out = 100)) %>%
+  mutate(log_engine = log(engine_size))
+ic <- exp(predict(mod_rls, newdata = grid, interval = "confidence"))
+ip <- exp(predict(mod_rls, newdata = grid, interval = "prediction"))
+
+grid <- grid %>%
+  mutate(fit = ic[, "fit"], ic_lwr = ic[, "lwr"], ic_upr = ic[, "upr"],
+         ip_lwr = ip[, "lwr"], ip_upr = ip[, "upr"])
+
+ggplot() +
+  geom_ribbon(data = grid, aes(x = engine_size, ymin = ip_lwr, ymax = ip_upr),
+              fill = "#9b5e4f", alpha = 0.15) +
+  geom_ribbon(data = grid, aes(x = engine_size, ymin = ic_lwr, ymax = ic_upr),
+              fill = "#9b5e4f", alpha = 0.35) +
+  geom_point(data = rls, aes(x = engine_size, y = price), alpha = 0.6, color = "#2980b9") +
+  geom_line(data = grid, aes(x = engine_size, y = fit), color = "#c0392b", linewidth = 1) +
+  labs(title = "Modelo simple: precio vs. tamaño del motor",
+       subtitle = "Banda oscura: IC 95% de la respuesta media; banda clara: intervalo de predicción 95%",
+       x = "Tamaño del motor", y = "Precio (USD)") +
+  theme_bw()
+```
+
+
+
+## Modelo de regresión lineal múltiple
+
+### ¿Por qué usamos una regresión lineal múltiple?
+
+Nuestra variable respuesta es el precio (`price`), que es continua, y queremos explicarla con varias características del automóvil (más de una variable explicativa, $k>1$), tanto numéricas como categóricas. Por eso usamos el modelo de **regresión lineal múltiple (RLM)**.
+
+Con este modelo buscamos (1) medir cuánto influye cada variable sobre el precio manteniendo las demás constantes, (2) construir una función de predicción y (3) calcular intervalos de confianza y de predicción. 
+
+
+```{r asimetria_precio, include=FALSE}
+# coeficiente de asimetría (momento estandarizado de orden 3)
+asim <- function(x) mean((x - mean(x))^3) / mean((x - mean(x))^2)^(3/2)
+asim_price     <- asim(df$price)
+asim_log_price <- asim(log(df$price))
+```
+
+**Transformación de la respuesta.** En el análisis exploratorio vimos que `price` tiene una asimetría positiva fuerte (1.8) y que su variabilidad aumenta con el tamaño del motor. Como la RLM supone errores normales con varianza constante, y siguiendo la sección 7.7 del libro (transformaciones para mejorar el ajuste), modelamos $\log(\text{price})$, cuya asimetría baja a 0.67. Con esta transformación cada coeficiente se interpreta como un cambio porcentual en el precio: si $x_j$ aumenta una unidad, el precio cambia en promedio $(e^{\beta_j}-1)\times 100\%$.
+
+### Preparación de las variables
+
+Como candidatas usamos las variables numéricas del análisis exploratorio (`engine-size`, `horsepower`, `curb-weight`) y las dos variables creadas en *Feature Engineering* (`avg_mpg` y `weight_power_ratio`). Las variables categóricas `body-style` y `fuel-type` se convierten en variables dummy (sección 8.12): `sedan` es la categoría de referencia de `body-style` y `gas` la de `fuel-type`, por lo que las dummy valen 0 en esas categorías.
+
+```{r datos_modelo}
+datos <- df %>%
+  transmute(
+    log_price          = log(price),
+    engine_size        = `engine-size`,
+    horsepower         = horsepower,
+    curb_weight        = `curb-weight`,
+    avg_mpg            = avg_mpg,
+    weight_power_ratio = weight_power_ratio,
+    bs_convertible     = as.numeric(`body-style` == "convertible"),
+    bs_hardtop         = as.numeric(`body-style` == "hardtop"),
+    bs_hatchback       = as.numeric(`body-style` == "hatchback"),
+    bs_wagon           = as.numeric(`body-style` == "wagon"),
+    diesel             = as.numeric(`fuel-type` == "diesel")
+  )
+
+# modelo de RLM con todas las variables candidatas
+mod_completo <- lm(log_price ~ ., data = datos)
+summary(mod_completo)
+```
+
+### Multicolinealidad
+
+Antes de elegir las variables revisamos la multicolinealidad (sección 8.11). En el análisis exploratorio ya habíamos visto que `horsepower` y `avg_mpg` están muy correlacionadas (-0.79), así que es probable que haya variables redundantes. Usamos el factor de inflación de la varianza (VIF) y la regla del libro: la variable $x_j$ es responsable de la multicolinealidad si $VIF_j > 5$.
+
+```{r vif_completo}
+library(car)
+
+v1 <- vif(mod_completo)
+round(v1, 2)
+```
+
+Varias variables superan el 5. La más alta es `curb_weight` ($VIF =  15.7$), así que la retiramos y volvemos a calcular.
+
+```{r vif_2}
+datos_2 <- datos %>% dplyr::select(-curb_weight)
+mod_2   <- lm(log_price ~ ., data = datos_2)
+
+v2 <- vif(mod_2)
+round(v2, 2)
+```
+
+Ahora `horsepower` sigue siendo problemática ($VIF = 13.5$), por lo que también la retiramos.
+
+```{r vif_3}
+datos_3 <- datos_2 %>% dplyr::select(-horsepower)
+mod_3   <- lm(log_price ~ ., data = datos_3)
+
+v3 <- vif(mod_3)
+round(v3, 2)
+```
+
+Con `curb_weight` y `horsepower` fuera, ningún VIF supera 5 (el máximo es 2.82). La información de ambas variables queda recogida en buena parte por `engine_size`, `avg_mpg` y `weight_power_ratio` (estas dos últimas las construimos justamente para reducir la correlación).
+
+### Selección de variables
+
+Con las 8 variables que quedan usamos el **método de todas las regresiones posibles**, que ajusta los $2^8-1=255$ modelos posibles y los compara con criterios estadísticos. Elegimos el modelo con menor **AIC**, que equilibra el ajuste con la complejidad, y lo comparamos con el de mayor $R^2$ ajustado.
+
+```{r todas_regresiones}
+library(olsrr)
+
+todas      <- ols_step_all_possible(mod_3)
+resultados <- todas$result
+
+# mejor modelo según el AIC
+mejor_aic <- resultados[which.min(resultados$aic), ]
+mejor_aic[, c("n", "predictors", "adjr", "aic")]
+
+# mejor modelo según el R^2 ajustado
+mejor_adjr <- resultados[which.max(resultados$adjr), ]
+mejor_adjr[, c("n", "predictors", "adjr", "aic")]
+```
+
+```{r grafico_aic_adjr}
+ggplot(resultados, aes(x = adjr, y = aic)) +
+  geom_point() +
+  theme_minimal() +
+  xlab(expression(R^2 * " ajustado")) +
+  ylab("AIC")
+```
+
+El AIC selecciona el modelo con 6 variables: `engine_size` `avg_mpg` `weight_power_ratio` `bs_convertible` `bs_hatchback diesel`. El modelo con mayor $R^2$ ajustado (0.8398) solo agrega una variable más y mejora el $R^2$ ajustado en menos de 0.001 frente al de AIC (0.8395). Por parsimonia nos quedamos con el modelo del AIC.
+
+### Modelo final
+
+```{r modelo_final}
+modelo_final <- lm(log_price ~ engine_size + avg_mpg + weight_power_ratio +
+                     bs_convertible + bs_hatchback + diesel, data = datos)
+summary(modelo_final)
+```
+
+#### Comparación con la selección secuencial
+
+Como complemento al método de todas las regresiones posibles, aplicamos la **selección secuencial** con el AIC como criterio: *forward* (parte del modelo sin variables y agrega), *backward* (parte del modelo completo y elimina) y *both* (en ambas direcciones).
+
+```{r sec_pasos}
+mod_nulo <- lm(log_price ~ 1, data = datos_3)
+
+step_fwd  <- step(mod_nulo, scope = formula(mod_3), direction = "forward",  trace = 0)
+step_bwd  <- step(mod_3, direction = "backward", trace = 0)
+step_both <- step(mod_nulo, scope = list(lower = ~ 1, upper = formula(mod_3)),
+                  direction = "both", trace = 0)
+
+vars_de <- function(m) paste(attr(terms(m), "term.labels"), collapse = " + ")
+
+tibble(Método = c("Todas las regresiones (menor AIC)", "Forward", "Backward", "Both"),
+       Variables = c(vars_de(modelo_final), vars_de(step_fwd), vars_de(step_bwd), vars_de(step_both)),
+       AIC = c(AIC(modelo_final), AIC(step_fwd), AIC(step_bwd), AIC(step_both)),
+       `R2 ajustado` = c(summary(modelo_final)$adj.r.squared, summary(step_fwd)$adj.r.squared,
+                         summary(step_bwd)$adj.r.squared, summary(step_both)$adj.r.squared)) %>%
+  kable(digits = 4, caption = "Comparación de métodos de selección de variables") %>%
+  scroll_box(width = "100%", height = "250px")
+```
+
+Observamos que los cuatro modelos coinciden, por lo tanto se refuerza la selección del modelo final. 
+
+Para verificar la teoría, calculamos los estimadores de forma matricial y los comparamos con los de `lm`:
+
+```{r matricial}
+X <- model.matrix(modelo_final)
+y <- datos$log_price
+
+beta_hat <- solve(t(X) %*% X) %*% t(X) %*% y
+cbind(matricial = as.vector(beta_hat), lm = coef(modelo_final))
+```
+
+Los coeficientes coinciden. El modelo estimado es:
+
+$$\widehat{\log(\text{price})} = 9.993  + 0.005 \\,\text{engine_size} -0.0362 \\,\text{avg_mpg} -0.0107 \\,\text{weight_power_ratio} + \cdots$$
+
+**Prueba de significancia global.** Probamos $H_0:\beta_1=\cdots=\beta_k=0$ frente a $H_1:\beta_j\neq 0$ para al menos un $j$, con la tabla ANOVA:
+
+```{r anova}
+n   <- nrow(X)
+p   <- ncol(X)
+k   <- p - 1
+SSE <- sum((y - X %*% beta_hat)^2)
+SST <- sum((y - mean(y))^2)
+SSR <- SST - SSE
+
+F0  <- (SSR / k) / (SSE / (n - k - 1))
+p_F <- pf(F0, k, n - k - 1, lower.tail = FALSE)
+
+tab_anova <- data.frame(
+  `Fuente de variación` = c("Regresión", "Residuales", "Total"),
+  `Suma de cuadrados`   = c(SSR, SSE, SST),
+  `Gl`                  = c(k, n - k - 1, n - 1),
+  `Cuadrado medio`      = c(SSR / k, SSE / (n - k - 1), NA),
+  `F0`                  = c(F0, NA, NA),
+  `p-valor`             = c(p_F, NA, NA),
+  check.names = FALSE
+)
+
+kable(tab_anova, digits = 4, caption = "Tabla ANOVA del modelo final")
+
+R2    <- SSR / SST
+R2_aj <- 1 - (SSE / (n - p)) / (SST / (n - 1))
+```
+
+Como $F_0=175.33$ y el p-valor es 1.56e-75, rechazamos $H_0$: al menos una variable explicativa aporta al modelo. El modelo explica el 84.4% de la variabilidad de $\log(\text{price})$ ($R^2$ ajustado = 0.839).
+
+**Significancia individual e intervalos de confianza.** Para cada coeficiente probamos $H_0:\beta_j=0$ con el estadístico $t_j$y construimos intervalos de confianza del 95%. También calculamos el cambio porcentual del precio asociado a cada variable.
+
+```{r inferencia_coef}
+summary(modelo_final)$coefficients
+
+confint.default(modelo_final)
+
+# cambio porcentual del precio por cada unidad de x_j
+efecto <- (exp(coef(modelo_final)[-1]) - 1) * 100
+round(efecto, 2)
+```
+
+Interpretación (manteniendo constantes las demás variables):
+
+- **`engine_size`:** por cada pulgada cúbica adicional de motor, el precio aumenta en promedio 0.5%.
+- **`avg_mpg`:** por cada milla por galón adicional, el precio cambia en promedio -3.55%. El signo negativo indica que, a igual tamaño de motor y demás características, los autos más eficientes tienden a ser más baratos.
+- **`weight_power_ratio`:** por cada libra por caballo de fuerza adicional, el precio cambia en -1.06 %; es decir, los autos con más potencia respecto a su peso son más caros.
+- **`bs_convertible`:** frente a un sedán, un convertible cuesta en promedio 21.8% más. Este coeficiente es el menos significativo ($p = 0.022$), probablemente porque solo hay 6 convertibles en la muestra.
+- **`bs_hatchback`:** frente a los demás estilos (sedan, hardtop y wagon), un hatchback cuesta en promedio 9% menos.
+- **`diesel`:** frente a un auto a gasolina, uno diésel cuesta en promedio 57.1% más.
+- **Intercepto:** es el valor de $\log(\text{price})$ cuando todas las variables valen cero; es solo una referencia teórica.
+
+#### Modelo alternativo con `body-style` completo
+
+En el modelo final se conservaron solo las dummy de convertible y hatchback. Eso significa que la categoría de referencia agrupa sedan, hardtop y wagon, y que los efectos se interpretan **frente a esos tres estilos juntos**, no frente al sedán. Para verificar que no se pierde información, ajustamos un modelo que incluye `body-style` completo (referencia: sedan) y lo comparamos con el modelo sin ese factor mediante una prueba F parcial.
+
+```{r alt_bodystyle}
+datos_alt <- df %>%
+  transmute(log_price = log(price),
+            engine_size = `engine-size`,
+            avg_mpg,
+            weight_power_ratio,
+            body_style = relevel(factor(`body-style`), ref = "sedan"),
+            diesel = as.numeric(`fuel-type` == "diesel"))
+
+mod_alt <- lm(log_price ~ ., data = datos_alt)
+summary(mod_alt)
+
+# prueba F parcial: ¿aporta body-style (completo)?
+anova(update(mod_alt, . ~ . - body_style), mod_alt)
+
+# comparación con el modelo final por AIC
+AIC(modelo_final, mod_alt)
+```
+
+La prueba F parcial no es significativa y el AIC no mejora, por lo tanto se mantiene el modelo final. La referencia de bs_convertible y bs_hatchback son "los demás estilos".
+
+### Verificación de la multicolinealidad en el modelo final
+
+```{r multicolinealidad_final}
+vif(modelo_final)
+kappa(modelo_final)
+
+library(mctest)
+mctest(modelo_final, type = "b")
+```
+
+Todos los VIF son menores que 5 (el máximo es 2.48). El número de condición de `kappa` (1189) es grande, pero probablemente se deba a que las variables están en escalas muy distintas (por ejemplo `engine_size` frente a las dummy). Por eso, como sugiere el libro, usamos también las pruebas complementarias de `mctest`: los indicadores individuales (VIF y TOL) y el número de condición no detectan colinealidad, y si alguna prueba global (como la de Farrar-Glauber, muy sensible cuando $n$ es grande) la señala, la interpretamos como colinealidad leve. Concluimos que no hay un problema grave de multicolinealidad.
+
+### Análisis de residuales
+
+Validamos los supuestos del modelo: independencia, normalidad, media cero y varianza constante de los errores.
+
+```{r supuestos}
+library(lmtest)
+
+r <- residuals(modelo_final)
+
+# 1) independencia: Durbin-Watson
+set.seed(123)
+dw <- durbinWatsonTest(modelo_final)
+dw
+
+# 2) normalidad: Shapiro-Wilk y Q-Q plot
+sw <- shapiro.test(r)
+sw
+car::qqPlot(r, las = 1)
+
+# 3) media cero
+tt <- t.test(r, mu = 0)
+tt
+
+# 4) varianza constante: Breusch-Pagan
+bp <- bptest(modelo_final)
+bp
+```
+
+```{r graficos_residuales}
+par(mfrow = c(2, 2))
+plot(modelo_final, las = 1, col = "darkseagreen", which = 1:3)
+par(mfrow = c(1, 1))
+```
+
+- **Media cero:** el p-valor de la prueba t es 1, por lo que se cumple el supuesto (lo esperado, pues el modelo tiene intercepto y se estima por MCO).
+- **Normalidad:** en Shapiro-Wilk, $W = 0.991$ y $p = 0.27$. No se rechaza la normalidad.
+- **Varianza constante:** en Breusch-Pagan, $p = 0.063$, por lo que se cumple la varianza constante.
+- **Independencia:** el estadístico de Durbin-Watson es `r round(dw$dw, 2)` (p = `r signif(dw$p, 2)`). Hay evidencia de autocorrelación. Una posible explicación es que la base está ordenada por marca, de modo que autos consecutivos de una misma marca tienen errores parecidos.
+
+Por lo anterior, los supuestos no se cumplen del todo. Aun así, la transformación logarítmica reduce la asimetría de la respuesta y las desviaciones son moderadas, por lo que usamos el modelo con cautela: las pruebas de hipótesis y los intervalos deben leerse como aproximados.
+
+#### Errores estándar robustos
+
+Como la prueba de Breusch-Pagan puede indicar varianza no constante, reportamos también los errores estándar robustos (HC3), que no dependen del supuesto de homocedasticidad:
+
+```{r robustos}
+coeftest(modelo_final, vcov = vcovHC(modelo_final, type = "HC3"))
+```
+
+### Outliers y observaciones influenciales
+
+Identificamos outliers con los residuales estudentizados (se consideran atípicos si $|r_i|>3$) y la prueba de Bonferroni, y observaciones influenciales con la distancia de Cook.
+
+```{r outliers_influenciales}
+# residuales estudentizados
+r_est <- rstudent(modelo_final)
+which(r_est < -3 | r_est > 3)
+
+# prueba de Bonferroni
+outlierTest(modelo_final, n.max = 5)
+
+# distancia de Cook
+Di      <- cooks.distance(modelo_final)
+n       <- nobs(modelo_final)
+p       <- length(coef(modelo_final))
+umbral  <- 4 / (n - p - 2)
+infl_idx <- which(Di > umbral)
+infl_idx
+
+plot(Di, type = "h", ylab = "Distancia de Cook", xlab = "Índice",
+     main = "Distancia de Cook (línea = umbral)")
+abline(h = umbral, lty = 2)
+text(infl_idx, Di[infl_idx], labels = infl_idx, pos = 3, cex = 0.8)
+```
+
+```{r p_bonferroni, include=FALSE}
+r_max  <- max(abs(r_est))
+p_bonf <- min(1, n * 2 * pt(r_max, df = n - p - 1, lower.tail = FALSE))
+```
+
+Las observaciones 30 tienen residuales estudentizados mayores que 3 en valor absoluto (el mayor es 3.25). Sin embargo, en la prueba de Bonferroni el p-valor ajustado es 0.272, por lo que no hay evidencia suficiente para afirmar que sean outliers. Por otro lado, 13 observaciones superan el umbral de Cook ($4/(n-p-2)=$ 0.0208), pero la mayor distancia es solo 0.194. Como no identificamos una causa asignable que justifique removerlas, las conservamos en el modelo.
+
+### Predicción
+
+Con el modelo final podemos estimar el precio de un auto con características dadas. Como ejemplo, tomamos un sedán a gasolina con motor de 120 pulgadas cúbicas, rendimiento promedio de 28 mpg y relación peso-potencia de 25. Los intervalos se calculan en la escala logarítmica y luego se devuelven a dólares con la función exponencial.
+
+```{r prediccion}
+dato_nuevo <- data.frame(engine_size = 120, avg_mpg = 28, weight_power_ratio = 25,
+                         bs_convertible = 0, bs_hatchback = 0, diesel = 0)
+
+# intervalo de confianza para el precio promedio
+pred_ic <- exp(predict(modelo_final, newdata = dato_nuevo, interval = "confidence"))
+pred_ic
+
+# intervalo de predicción para un auto nuevo
+pred_ip <- exp(predict(modelo_final, newdata = dato_nuevo, interval = "prediction"))
+pred_ip
+```
+
+Para un auto con esas características, el precio estimado es de aproximadamente **\$11032 USD**. Con una confianza del 95%, el precio promedio de los autos con esas condiciones está entre **\$10594** y **\$11489 USD**, mientras que el precio de un auto nuevo con esas condiciones estaría entre **\$7403** y **\$16441 USD**. El intervalo de predicción es más amplio porque incluye, además, la incertidumbre del error aleatorio de un auto nuevo.
+
+### Conclusiones del modelo
+
+- Elegimos una RLM porque la respuesta es continua y hay varias variables explicativas, usando $\log(\text{price})$ para corregir la fuerte asimetría del precio.
+- Eliminamos `curb_weight` y `horsepower` por multicolinealidad ($VIF > 5$) y seleccionamos las variables con el AIC mediante todas las regresiones posibles.
+- El modelo final tiene 6 variables explicativas (`engine_size`, `avg_mpg`, `weight_power_ratio`, `bs_convertible`, `bs_hatchback`, `diesel`) y un $R^2$ ajustado de 0.839.
+- Un motor más grande y la carrocería convertible o el motor diésel se asocian con precios más altos, mientras que los hatchback y los autos con mayor rendimiento de combustible tienden a ser más baratos.
+- Los supuestos de normalidad, varianza constante e independencia no se cumplen del todo, por lo que las conclusiones inferenciales deben tomarse con cautela.
+
+## Conclusiones generales
+
+
+- **Exploración:** el precio es asimétrico a la derecha; la mayoría de los autos son económicos y un grupo pequeño de gama alta alarga la cola. Esto motivó la transformación logarítmica.
+- **Correlación:** las variables de tamaño y potencia del motor (`engine-size`, `horsepower`, `curb-weight`) son las más asociadas con el precio; el rendimiento de combustible se asocia de forma inversa.
+- **Pruebas de hipótesis:** Los resultados muestran que el rendimiento en carretera supera significativamente al urbano en $5.51\text{ mpg}$ ($p = 0$, $d_z = 3.41$) y que el precio varía de forma significativa según el estilo del vehículo ($p = 4.98 \times 10^{-5}$, $\epsilon^2 = 0.125$). En cuanto al combustible, aunque los autos diésel cuestan un $25.9\%$ más en promedio ($d = 0.46$), la diferencia estadística es marginal y depende de la prueba empleada (Welch $p = 0.057$ vs. Wilcoxon $p = 0.041$).
+- **Tabla de contingencia:** Sí existe una asociación estadísticamente significativa entre el tipo de tracción y el estilo de carrocería ($\chi^2 = 15.63$, $p = 0.0036$ mediante simulación de Monte Carlo), pero su magnitud es débil ($V\text{ de Cramér} = 0.197$). En términos prácticos, aunque la distribución de la tracción no es independiente de la carrocería, la relación entre ambas variables es baja..
+- **Regresión simple:** El tamaño del motor tiene un efecto positivo sobre el precio y permite estimar el promedio con alta precisión: para $120\text{ in}^3$, el valor típico es de $\$11{,}282\text{ USD}$, con un intervalo de confianza del $95\%$ estrecho ($\$10{,}865\text{ a }\$11{,}714\text{ USD}$).No obstante, la capacidad del modelo para predecir vehículos individuales es limitada debido a la alta variabilidad residual, lo que amplía el intervalo de predicción al $95\%$ entre $\$6{,}615$ y $\$19{,}239\text{ USD}$ y confirma que otros factores también determinan el precio final.
+- **Regresión múltiple:** Se ajustó una regresión lineal múltiple sobre $\log(\text{price})$ para corregir la asimetría del precio; tras eliminar `curb_weight` y `horsepower` por multicolinealidad ($\text{VIF}$ mayor que $5$) y seleccionar variables con AIC, el modelo final de $6$ predictores (`engine_size`, `avg_mpg`, `weight_power_ratio`, `bs_convertible`, `bs_hatchback` y `diesel`) alcanzó un $R^2\text{ ajustado}$ de $0.839$. En él, mayor tamaño de motor, carrocería convertible y motor diésel se asocian con precios más altos, mientras que los hatchback y mayor rendimiento (`avg_mpg`) se asocian con precios menores, aunque las inferencias deben tomarse con cautela porque no se cumplen del todo los supuestos de normalidad, varianza constante e independencia.
+- **Limitaciones:** supuestos que no se cumplen del todo, la base es de 1985 con solo 205 autos, y hay categorías con muy pocas observaciones (`convertible`, `hardtop`, `diésel`).
+
+## Referencias
+
+- Schlimmer, J. C. (1987). *Automobile* [conjunto de datos]. UCI Machine Learning Repository. <!-- REVISAR: completar con el enlace y el formato de citación que pida el profesor -->
+- de Oro Aguado, C. (2026). *Notas de métodos estadísticos*. https://cdeoroaguado.github.io/rbook_met_estad/
+- R Core Team. *R: A Language and Environment for Statistical Computing*.
+- Wickham, H. et al. *Welcome to the tidyverse*. Journal of Open Source Software.
+- Fox, J. y Weisberg, S. *An R Companion to Applied Regression* (paquete `car`).
