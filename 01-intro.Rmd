@@ -1,5 +1,19 @@
 # Desarrollo {#intro}
 
+## Video Explicativo
+```{r video-youtube, echo=FALSE}
+htmltools::HTML('
+<div style="position:relative; padding-bottom:56.25%; height:0; overflow:hidden; max-width:100%;">
+  <iframe src="https://www.youtube.com/embed/wzmFlbz6r3c"
+          style="position:absolute; top:0; left:0; width:100%; height:100%;"
+          title="Análisis estadístico de la base Automobile en R"
+          frameborder="0"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowfullscreen></iframe>
+</div>
+')
+```
+
 Librerias ultilizadas:
 ```{r libreria, message=FALSE, warning=FALSE}
 library(tidyverse)

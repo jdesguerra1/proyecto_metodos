@@ -67,3 +67,4 @@ análisis-de-residuales-1
 errores-estándar-robustos
 conclusiones-generales
 referencias
+video-explicativo
